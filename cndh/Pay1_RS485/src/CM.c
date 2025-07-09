@@ -134,7 +134,6 @@ void USART6_IRQHandler(void)
     HAL_UART_IRQHandler(&huart6);
 }
 
-
 // static void uart6_deinit(void)
 // {
 //     __HAL_RCC_USART6_CLK_DISABLE();
@@ -143,25 +142,27 @@ void USART6_IRQHandler(void)
 //     //    HAL_NVIC_DisableIRQ(USART6_IRQn);
 // }
 
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-uint8_t tx_buffer[7] = {ESC, SOM, 197, MainOBC, Magnetometer, ESC, EOM};
-// uint8_t tx_buffer[7] = {ESC, SOM, 193, MainOBC, ReactionWheel, ESC, EOM};
+#define NODE_COUNT  3
+uint8_t tx_buffer[NODE_COUNT][7] = {
+    {ESC, SOM, 197, MainOBC, Magnetometer, ESC, EOM},
+    {ESC, SOM, 193, MainOBC, ReactionWheel1, ESC, EOM},
+    {ESC, SOM, 193, MainOBC, ReactionWheel2, ESC, EOM}
+};
 uint8_t rs485_rx_buffer[MAX_PACKET_LENGTH] = {0};
 static volatile uint8_t rs485_TxCplt_flag = 0;
 static volatile uint8_t rs485_RxCplt_flag = 0;
-static uint16_t count = 0;
+//static uint16_t count = 0;
+uint8_t node_idx = 0;
 Primary primary;
+gain1 gain_CW1;
+gain2 gain_CW2;
+// uint8_t RW1[64] = {0};
+// uint8_t RW2[64] = {0};
 void RS485_TxMode(void);
 void RS485_RxMode(void);
-
-
 
 void U6_RS485_Init(void)
 {
@@ -170,21 +171,20 @@ void U6_RS485_Init(void)
     RS485_TEST_Task_taskHandle = osThreadNew(RS485_TEST_Task, NULL, &RS485_TEST_Task_attributes);
 }
 
-
 void RS485_TEST_Task(void *argument)
 {
-    ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
+   // ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
     RS485_TxMode();
-    if (HAL_UART_Transmit_IT(&huart6, tx_buffer, 7) != HAL_OK)
+    if (HAL_UART_Transmit_IT(&huart6, tx_buffer[node_idx], 7) != HAL_OK)
     {
-        ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
+  //      ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
     }
+
     for (;;)
     {
         RS485_ProcessEvents(&huart6);
     }
 }
-
 
 void RS485_ProcessEvents(UART_HandleTypeDef *huart)
 {
@@ -195,10 +195,9 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
         RS485_RxMode();
         if (HAL_UART_Receive(&huart6, rs485_rx_buffer, MAX_PACKET_LENGTH, 50) == HAL_OK)          // goal for timeout is 50ms
         {
-            ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
-            ES_TRACE_DEBUG("UART RxState: %d, gState: %d\n", huart6.RxState, huart6.gState);
+    //       ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
+   //        ES_TRACE_DEBUG("UART RxState: %d, gState: %d\n", huart6.RxState, huart6.gState);
         }
-        // HAL_UART_Receive(&huart6, rs485_rx_buffer, MAX_PACKET_LENGTH, 50);
         HAL_UART_AbortReceive(&huart6);
         rs485_RxCplt_flag = 1;
     }
@@ -206,18 +205,19 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
     if (rs485_RxCplt_flag)
     {
         rs485_RxCplt_flag = 0;
-
-        osDelay(50);                                // for controlling frequency
         DataParsing(rs485_rx_buffer);
         
+        osDelay(50);                                // for controlling frequency
+
+        node_idx = (node_idx++) % NODE_COUNT;
         RS485_TxMode();
-        if (HAL_UART_Transmit_IT(&huart6, tx_buffer, 7) != HAL_OK)
+        if (HAL_UART_Transmit_IT(&huart6, tx_buffer[node_idx], 7) != HAL_OK)
         {
-            ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
+     //       ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
         }
+
     }
 }
-
 
 void DataParsing(uint8_t *data)
 {
@@ -225,54 +225,76 @@ void DataParsing(uint8_t *data)
     static uint16_t received_size = 0;
     static uint8_t write_idx = 5;
     static uint8_t read_idx = 5;
-    
+
+
     received_size =  MAX_PACKET_LENGTH - huart6.RxXferCount;
     payload_size = received_size - 7;                           // 7: ESC, SOR, TLM ID, SRC, DST, ESC, EOM
 
-    ES_TRACE_DEBUG("count: %d\r\n", ++count);
+  //  ES_TRACE_DEBUG("count: %d\r\n", ++count);
+
+    if (node_idx == 0)
+    {
+        /* ================ printing for debug ================ */
+        char debug_str[3 * received_size + 1];
+        memset(debug_str, 0, sizeof(debug_str));
+        for (int i = 0; i < received_size; i++) {
+            sprintf(&debug_str[i * 3], "%02X ", rs485_rx_buffer[i]);
+        }
+    //    ES_TRACE_DEBUG("rs485_rx_buffer: %s\r\n", debug_str);
 
 
-    /* ================ printing for debug ================ */
-    char debug_str[3 * received_size + 1];
-    memset(debug_str, 0, sizeof(debug_str));
-    for (int i = 0; i < received_size; i++) {
-        sprintf(&debug_str[i * 3], "%02X ", rs485_rx_buffer[i]);
-    }
-    ES_TRACE_DEBUG("rs485_rx_buffer: %s\r\n", debug_str);
-
-
-
-    /* ================ 0x1F1F -> 0x1F decoding ================ */
-    if (payload_size > sizeof(primary)) {
-        write_idx = 5;
-        read_idx = 5;
-        while (read_idx < payload_size + 5) {
-            if (data[read_idx] == ESC && data[read_idx + 1] == ESC) {
-                data[write_idx++] = ESC;
-                read_idx += 2;
-            } else {
-                data[write_idx++] = data[read_idx++];
+        /* ================ 0x1F1F -> 0x1F decoding ================ */
+        if (payload_size > sizeof(primary)) {
+            write_idx = 5;
+            read_idx = 5;
+            while (read_idx < payload_size + 5) {
+                if (data[read_idx] == ESC && data[read_idx + 1] == ESC) {
+                    data[write_idx++] = ESC;
+                    read_idx += 2;
+                } else {
+                    data[write_idx++] = data[read_idx++];
+                }
             }
         }
+
+        memcpy(&primary, &data[5], sizeof(primary));
+        ES_TRACE_DEBUG(
+            "Primary Data [Magnetometer] => X: %.4f, Y: %.4f, Z: %.4f, Valid: %s\r\n",
+            primary.X_axis,
+            primary.Y_axis,
+            primary.Z_axis,
+            primary.DataValid ? "true" : "false"
+        );
     }
-
-    memcpy(&primary, &data[5], sizeof(primary));
-    ES_TRACE_DEBUG(
-        "Primary Data [Magnetometer] => X: %.4f, Y: %.4f, Z: %.4f, Valid: %s\r\n",
-        primary.X_axis,
-        primary.Y_axis,
-        primary.Z_axis,
-        primary.DataValid ? "true" : "false"
-    );
+    else if (node_idx == 1)
+    {
+        // ReactionWheel1
+        memcpy(&gain_CW1, &data[5], sizeof(gain_CW1));
+        ES_TRACE_DEBUG(
+            "Main Gain Data [ReactionWheel 1] => Kp: %.4f, Ki: %.4f, Kd: %.4f\r\n",
+            gain_CW1.Kp,
+            gain_CW1.Ki,
+            gain_CW1.Kd
+        );
+    }
+    else if (node_idx == 2)
+    {
+        // ReactionWheel2
+        memcpy(&gain_CW2, &data[5], sizeof(gain_CW2));
+        ES_TRACE_DEBUG(
+            "Main Gain Data [ReactionWheel 2] => Kp: %.4f, Ki: %.4f, Kd: %.4f\r\n",
+            gain_CW2.Kp,
+            gain_CW2.Ki,
+            gain_CW2.Kd
+        );
+    }
 }
-
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance != USART6) return;
     rs485_TxCplt_flag = 1;
 }
-
 
 void RS485_TxMode(void)
 {
@@ -285,14 +307,13 @@ void RS485_TxMode(void)
     }
 }
 
-
 void RS485_RxMode(void)
 {
     demo_uart6_DriverDisable();
     demo_uart6_ReceptionEnable();
-    while ((((U6_RS485_Driver_Pins.DE.port->ODR >> 8) & 0x1) == 1) ||  
+    while ((((U6_RS485_Driver_Pins.DE.port->ODR >> 8) & 0x1) == 1) ||
            (((U6_RS485_Driver_Pins.nRE.port->ODR >> 13) & 0x1) == 1))
     {
-//        osDelay(1);
+        osDelay(1);
     }
 }

@@ -15,8 +15,9 @@
 #include <stdio.h>
 
 #define MainOBC          240
-#define ReactionWheel    1
 #define Magnetometer     1
+#define ReactionWheel1    2     // CubeWheel 24307
+#define ReactionWheel2    3     // CubeWheel 24308
 
 #define ESC  0x1F  // Escape
 #define SOM  0x80  // Start of Message
@@ -154,7 +155,11 @@ typedef struct {
     float Kp;
     float Ki;
     float Kd;
-} MainGain; // ID: 193
+} MainGain_t; // ID: 193
+
+typedef MainGain_t gain1;    // CW24307
+typedef MainGain_t gain2;    // CW24308
+
 
 /* ------------- CubeWheel TCTLM ------------- */
 

@@ -172,13 +172,12 @@ typedef MainGain_t gain2;    // CW24308
 * \brief STM32 UART6 Interrupt handler callback
 */
 void USART6_IRQHandler(void);
-// 굳이 헤더파일에 선언 안해도 되는 것 같음, 만약 내가 이 함수를 직접 호출해서 사용하면 선언필요.
-
 
 void U6_RS485_Init(void);
 void RS485_TEST_Task(void *arg);
 void RS485_ProcessEvents(UART_HandleTypeDef *huart);
-
+void RS485_TxMode(void);
+void RS485_RxMode(void);
 
 void RS485_TCTLM(uint8_t ID, uint32_t DATA);
 void resend_TCTLM(void);

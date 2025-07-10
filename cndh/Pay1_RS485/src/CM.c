@@ -147,9 +147,20 @@ void USART6_IRQHandler(void)
 
 #define NODE_COUNT  3
 uint8_t tx_buffer[NODE_COUNT][7] = {
-    {ESC, SOM, 197, MainOBC, Magnetometer, ESC, EOM},
-    {ESC, SOM, 193, MainOBC, ReactionWheel1, ESC, EOM},
-    {ESC, SOM, 193, MainOBC, ReactionWheel2, ESC, EOM}
+    {ESC, SOM, 188, MainOBC, Magnetometer, ESC, EOM},       // All Service States
+    {ESC, SOM, 190, MainOBC, Magnetometer, ESC, EOM},       // Deployment Status
+    {ESC, SOM, 193, MainOBC, Magnetometer, ESC, EOM},       // Redundant Magnetometer Measurement
+    {ESC, SOM, 197, MainOBC, Magnetometer, ESC, EOM},       // Primary Magnetometer Measurement
+
+    {ESC, SOM, 186, MainOBC, ReactionWheel1, ESC, EOM},     // Wheel Reference Torque
+    {ESC, SOM, 188, MainOBC, ReactionWheel1, ESC, EOM},     // Wheel Speed Measurement
+    {ESC, SOM, 196, MainOBC, ReactionWheel1, ESC, EOM},     // Set momentum wheel reference speed
+    {ESC, SOM, 197, MainOBC, ReactionWheel1, ESC, EOM},     // Switch motor power on/off
+
+    {ESC, SOM, 186, MainOBC, ReactionWheel2, ESC, EOM},
+    {ESC, SOM, 188, MainOBC, ReactionWheel2, ESC, EOM},
+    {ESC, SOM, 196, MainOBC, ReactionWheel2, ESC, EOM},
+    {ESC, SOM, 197, MainOBC, ReactionWheel2, ESC, EOM},
 };
 uint8_t rs485_rx_buffer[MAX_PACKET_LENGTH] = {0};
 static volatile uint8_t rs485_TxCplt_flag = 0;
@@ -159,10 +170,7 @@ uint8_t node_idx = 0;
 Primary primary;
 gain1 gain_CW1;
 gain2 gain_CW2;
-// uint8_t RW1[64] = {0};
-// uint8_t RW2[64] = {0};
-void RS485_TxMode(void);
-void RS485_RxMode(void);
+
 
 void U6_RS485_Init(void)
 {
@@ -173,11 +181,11 @@ void U6_RS485_Init(void)
 
 void RS485_TEST_Task(void *argument)
 {
-   // ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
+    ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
     RS485_TxMode();
     if (HAL_UART_Transmit_IT(&huart6, tx_buffer[node_idx], 7) != HAL_OK)
     {
-  //      ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
+        ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
     }
 
     for (;;)
@@ -205,11 +213,13 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
     if (rs485_RxCplt_flag)
     {
         rs485_RxCplt_flag = 0;
-        DataParsing(rs485_rx_buffer);
-        
-        osDelay(50);                                // for controlling frequency
 
+
+        DataParsing(rs485_rx_buffer);
+        osDelay(50);                                // for controlling frequency
         node_idx = (node_idx++) % NODE_COUNT;
+
+
         RS485_TxMode();
         if (HAL_UART_Transmit_IT(&huart6, tx_buffer[node_idx], 7) != HAL_OK)
         {
@@ -230,7 +240,7 @@ void DataParsing(uint8_t *data)
     received_size =  MAX_PACKET_LENGTH - huart6.RxXferCount;
     payload_size = received_size - 7;                           // 7: ESC, SOR, TLM ID, SRC, DST, ESC, EOM
 
-  //  ES_TRACE_DEBUG("count: %d\r\n", ++count);
+    ES_TRACE_DEBUG("count: %d\r\n", ++count);
 
     if (node_idx == 0)
     {

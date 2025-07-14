@@ -1,5 +1,5 @@
-#ifndef ESPF_ARCH_STM32H753IIT_DRIVERS_RS485_JISOO_INC_RS485_JISOO_H_
-#define ESPF_ARCH_STM32H753IIT_DRIVERS_RS485_JISOO_INC_RS485_JISOO_H_
+#ifndef PAY1_RS485_Magnetometer_Reactionwheel_SEUNGWON_INC_H_
+#define PAY1_RS485_Magnetometer_Reactionwheel_SEUNGWON_INC_H_
 
 #include "main.h"
 #include "cmsis_os2.h"
@@ -161,6 +161,30 @@ typedef MainGain_t gain1;    // CW24307
 typedef MainGain_t gain2;    // CW24308
 
 
+// Table 58: MagState Enumeration Values
+typedef enum {
+    MAG_STATE_DEPLOY_ARM = 0,    // CubeMag Svc is Armed to Deploy
+    MAG_STATE_DEPLOY = 1,        // CubeMag Svc is Deploying
+    MAG_STATE_IDLE = 2,          // CubeMag Svc is Idle
+    MAG_STATE_ERROR = 3          // CubeMag Svc is in an error state
+} MagState_t;
+
+// Table 59: MntState Enumeration Values  
+typedef enum {
+    MNT_STATE_OFF = 0,           // Mnt Svc is off
+    MNT_STATE_INIT = 1,          // Mnt Svc is Initializing
+    MNT_STATE_IDLE = 2,          // Mnt Svc is Idle
+    MNT_STATE_AUTO = 3,          // Mnt Svc is Auto Sampling
+    MNT_STATE_SAMPLE = 4,        // Mnt Svc is Sampling
+    MNT_STATE_ERROR = 5          // Mnt Svc is in an error state
+} MntState_t;
+
+// Table 57: State Telemetry Format ID 188 (3 bytes total)
+typedef struct __attribute__((packed)) {
+    uint8_t mag_svc_state;       // Bits 0-7: CubeMag Service State
+    uint8_t primary_mag_state;   // Bits 8-15: Primary Magnetometer State
+    uint8_t red_mag_state;       // Bits 16-23: Redundant Magnetometer State
+} StateTelemetry188_t;
 /* ------------- CubeWheel TCTLM ------------- */
 
 
@@ -191,4 +215,4 @@ void flush_buffer(uint8_t *buffer);
 uint8_t getDataLengthById(TCTLM_ID id);
 
 
-#endif /* ESPF_ARCH_STM32H753IIT_DRIVERS_RS485_JISOO_INC_RS485_JISOO_H_ */
+#endif /* PAY1_RS485_Magnetometer_Reactionwheel_SEUNGWON_INC_H_*/

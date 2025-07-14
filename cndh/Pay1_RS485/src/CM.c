@@ -147,6 +147,7 @@ void USART6_IRQHandler(void)
 
 #define NODE_COUNT  3
 uint8_t tx_buffer[NODE_COUNT][7] = {
+    {ESC, SOM, 186, MainOBC, Magnetometer, ESC, EOM},       // CubeMag Config
     {ESC, SOM, 188, MainOBC, Magnetometer, ESC, EOM},       // All Service States
     {ESC, SOM, 190, MainOBC, Magnetometer, ESC, EOM},       // Deployment Status
     {ESC, SOM, 193, MainOBC, Magnetometer, ESC, EOM},       // Redundant Magnetometer Measurement
@@ -170,7 +171,10 @@ uint8_t node_idx = 0;
 Primary primary;
 gain1 gain_CW1;
 gain2 gain_CW2;
-
+static uint16_t payload_size = 0;
+static uint16_t received_size = 0;
+static uint8_t write_idx = 5;
+static uint8_t read_idx = 5;
 
 void U6_RS485_Init(void)
 {
@@ -214,7 +218,7 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
     {
         rs485_RxCplt_flag = 0;
 
-
+        convert_packet_1f1f_to_1f(rs485_rx_buffer);
         DataParsing(rs485_rx_buffer);
         osDelay(50);                                // for controlling frequency
         node_idx = (node_idx++) % NODE_COUNT;
@@ -231,73 +235,76 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
 
 void DataParsing(uint8_t *data)
 {
-    static uint16_t payload_size = 0;
-    static uint16_t received_size = 0;
-    static uint8_t write_idx = 5;
-    static uint8_t read_idx = 5;
-
-
-    received_size =  MAX_PACKET_LENGTH - huart6.RxXferCount;
-    payload_size = received_size - 7;                           // 7: ESC, SOR, TLM ID, SRC, DST, ESC, EOM
-
-    ES_TRACE_DEBUG("count: %d\r\n", ++count);
-
-    if (node_idx == 0)
+    if (data[0] != ESC || data[1] != SOM)
     {
-        /* ================ printing for debug ================ */
-        char debug_str[3 * received_size + 1];
-        memset(debug_str, 0, sizeof(debug_str));
-        for (int i = 0; i < received_size; i++) {
-            sprintf(&debug_str[i * 3], "%02X ", rs485_rx_buffer[i]);
+        ES_TRACE_DEBUG("Invalid packet received.\r\n");
+        return; // Exit if the packet is invalid
+    }
+
+    if (data[3] == Magnetometer) {
+        switch (data[2]) {
+            case 186:  // MainOBC
+    
+                break;
+            case 188:  // All Service States
+                break;
+            case 190:  // Deployment Status
+                break;
+            case 193:  // Redundant Magnetometer Measurement
+                memcpy(&Redundant, &data[5], sizeof(Redundant));
+                ES_TRACE_DEBUG(
+                    "Redundant Data [Magnetometer] => X: %.4f, Y: %.4f, Z: %.4f, Valid: %s\r\n",
+                    Redundant.X_axis,
+                    Redundant.Y_axis,
+                    Redundant.Z_axis,
+                    Redundant.DataValid ? "true" : "false"
+                );
+                break;
+            case 197:  // Primary Magnetometer Measurement
+                memcpy(&primary, &data[5], sizeof(primary));
+                ES_TRACE_DEBUG(
+                    "Primary Data [Magnetometer] => X: %.4f, Y: %.4f, Z: %.4f, Valid: %s\r\n",
+                    primary.X_axis,
+                    primary.Y_axis,
+                    primary.Z_axis,
+                    primary.DataValid ? "true" : "false"
+                );
+                break;
+    
+            default:
+                ES_TRACE_DEBUG("Unknown Node ID: %d\r\n", data[2]);
+                return;
         }
-    //    ES_TRACE_DEBUG("rs485_rx_buffer: %s\r\n", debug_str);
-
-
-        /* ================ 0x1F1F -> 0x1F decoding ================ */
-        if (payload_size > sizeof(primary)) {
-            write_idx = 5;
-            read_idx = 5;
-            while (read_idx < payload_size + 5) {
-                if (data[read_idx] == ESC && data[read_idx + 1] == ESC) {
-                    data[write_idx++] = ESC;
-                    read_idx += 2;
-                } else {
-                    data[write_idx++] = data[read_idx++];
-                }
-            }
+    }
+    else if (data[3] == ReactionWheel1) {
+        switch (data[2]) {
+            case 186:
+                break;
+            case 188:
+                break;
+            case 196:
+                break;
+            case 197:
+                break;
         }
+    }
+    else if (data[3] == ReactionWheel2) {
+        switch (data[2]) {
+            case 186:
+                break;
+            case 188:
+                break;
+            case 196:
+                break;
+            case 197:
+                break;
+        }
+    }
+    else {
+        ES_TRACE_DEBUG("Unknown address: %d\r\n", data[3]);
+        return; 
+    }
 
-        memcpy(&primary, &data[5], sizeof(primary));
-        ES_TRACE_DEBUG(
-            "Primary Data [Magnetometer] => X: %.4f, Y: %.4f, Z: %.4f, Valid: %s\r\n",
-            primary.X_axis,
-            primary.Y_axis,
-            primary.Z_axis,
-            primary.DataValid ? "true" : "false"
-        );
-    }
-    else if (node_idx == 1)
-    {
-        // ReactionWheel1
-        memcpy(&gain_CW1, &data[5], sizeof(gain_CW1));
-        ES_TRACE_DEBUG(
-            "Main Gain Data [ReactionWheel 1] => Kp: %.4f, Ki: %.4f, Kd: %.4f\r\n",
-            gain_CW1.Kp,
-            gain_CW1.Ki,
-            gain_CW1.Kd
-        );
-    }
-    else if (node_idx == 2)
-    {
-        // ReactionWheel2
-        memcpy(&gain_CW2, &data[5], sizeof(gain_CW2));
-        ES_TRACE_DEBUG(
-            "Main Gain Data [ReactionWheel 2] => Kp: %.4f, Ki: %.4f, Kd: %.4f\r\n",
-            gain_CW2.Kp,
-            gain_CW2.Ki,
-            gain_CW2.Kd
-        );
-    }
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
@@ -326,4 +333,34 @@ void RS485_RxMode(void)
     {
         osDelay(1);
     }
+}
+
+
+void convert_packet_1f1f_to_1f(uint8_t *data)
+{
+    payload_size = 0;
+    received_size = 0;
+    write_idx = 5;
+    read_idx = 5;
+    received_size =  MAX_PACKET_LENGTH - huart6.RxXferCount;
+    payload_size = received_size - 7;                           // 7: ESC, SOR, TLM ID, SRC, DST, ESC, EOM
+    
+    /* ================ printing for debug ================ */
+    // char debug_str[3 * received_size + 1];
+    // memset(debug_str, 0, sizeof(debug_str));
+    // for (int i = 0; i < received_size; i++) {
+    //     sprintf(&debug_str[i * 3], "%02X ", rs485_rx_buffer[i]);
+    // }
+
+    ES_TRACE_DEBUG("count: %d\r\n", ++count);
+
+    while (read_idx < payload_size + 5) {
+        if (data[read_idx] == ESC && data[read_idx + 1] == ESC) {
+            data[write_idx++] = ESC;
+            read_idx += 2;
+        } else {
+            data[write_idx++] = data[read_idx++];
+        }
+    }
+
 }

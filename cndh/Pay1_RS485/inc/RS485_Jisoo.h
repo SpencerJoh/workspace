@@ -79,26 +79,18 @@ static const TCTLM_DataSize_t TCTLM_DataSizes[] = {
 
 
 /* ------------- CubeMag TCTLM ------------- */
+ // CubeMag Config Telemetry Format (ID: 186)
+// Frame Length: 4 bytes
+typedef struct __attribute__((packed)) {
+    uint8_t PreferredPrimaryMagnetometer : 4;    // bits 0-3, ENUM
+    uint8_t CurrentPrimaryMagnetometer   : 4;    // bits 4-7, ENUM
+    uint16_t DeployTimeout;                      // bits 8-23, UINT (Unit: [mS])
+    uint8_t PrimaryAutoSelect           : 1;     // bit 24, BOOL
+    uint8_t Reserved                    : 7;     // bits 25-31, unused
+} CubeMagConfig_t;                              // ID: 186
 
-// Unit of measure: [nT]
-// Frame Length: 13 bytes
-// {32bits, 32bits, 32bits, 1bit}
+typedef CubeMagConfig_t CubeMagConfig;
 
-/*
-typedef struct __attribute__((packed)) {    // padding 방지
-    float X_axis;
-    float Y_axis;
-    float Z_axis;
-    bool DataValid;
-} PrimaryMagnetometerMeasurement;   // ID: 197
-
-typedef struct __attribute__((packed)) {    // padding 방지
-    float X_axis;
-    float Y_axis;
-    float Z_axis;
-    bool DataValid;
-} RedundantMagnetometerMeasurement;  // ID: 193
-*/
 
 typedef struct __attribute__((packed)) {    // padding 방지
     float X_axis;
@@ -124,6 +116,7 @@ typedef struct __attribute__((packed)) {
     // 나머지 3비트는 미사용
 } DeploymentStatus_t;               // ID: 190
 
+typedef DeploymentStatus_t DeploymentStatus;
 
 typedef enum {
     MAG_SVC_DEPLOY_ARM = 0,
@@ -147,44 +140,50 @@ typedef struct __attribute__((packed)) {
     MagnetometerState_t RedundantMagState;
 } AllServiceStates_t;                  // ID: 188
 
+typedef AllServiceStates_t AllServiceStates;
 
 /* ------------- CubeMag TCTLM ------------- */
 
 /* ------------- CubeWheel TCTLM ------------- */
-typedef struct {
-    float Kp;
-    float Ki;
-    float Kd;
-} MainGain_t; // ID: 193
+// typedef struct {
+//     float Kp;
+//     float Ki;
+//     float Kd;
+// } MainGain_t; // ID: 193
 
-typedef MainGain_t gain1;    // CW24307
-typedef MainGain_t gain2;    // CW24308
+// typedef MainGain_t gain1;    // CW24307
+// typedef MainGain_t gain2;    // CW24308
 
-
-// Table 58: MagState Enumeration Values
-typedef enum {
-    MAG_STATE_DEPLOY_ARM = 0,    // CubeMag Svc is Armed to Deploy
-    MAG_STATE_DEPLOY = 1,        // CubeMag Svc is Deploying
-    MAG_STATE_IDLE = 2,          // CubeMag Svc is Idle
-    MAG_STATE_ERROR = 3          // CubeMag Svc is in an error state
-} MagState_t;
-
-// Table 59: MntState Enumeration Values  
-typedef enum {
-    MNT_STATE_OFF = 0,           // Mnt Svc is off
-    MNT_STATE_INIT = 1,          // Mnt Svc is Initializing
-    MNT_STATE_IDLE = 2,          // Mnt Svc is Idle
-    MNT_STATE_AUTO = 3,          // Mnt Svc is Auto Sampling
-    MNT_STATE_SAMPLE = 4,        // Mnt Svc is Sampling
-    MNT_STATE_ERROR = 5          // Mnt Svc is in an error state
-} MntState_t;
-
-// Table 57: State Telemetry Format ID 188 (3 bytes total)
+// Table 52: Wheel Reference Torque Telemetry Format (ID: 186)
+// Frame Length: 4 bytes
 typedef struct __attribute__((packed)) {
-    uint8_t mag_svc_state;       // Bits 0-7: CubeMag Service State
-    uint8_t primary_mag_state;   // Bits 8-15: Primary Magnetometer State
-    uint8_t red_mag_state;       // Bits 16-23: Redundant Magnetometer State
-} StateTelemetry188_t;
+    float ReferenceTorque;              // 32 bits, FLOAT, Unit: [mNm]
+} WheelReferenceTorque_t;              // ID: 186
+
+// Table 55: Wheel Speed Telemetry Format (ID: 188)  
+// Frame Length: 5 bytes
+typedef struct __attribute__((packed)) {
+    float WheelSpeed;                   // bits 0-31, FLOAT, Unit: [RPM]
+    uint8_t WheelErrorState;            // bits 32-39, ENUM (Table 48)
+} WheelSpeedTelemetry_t;               // ID: 188
+
+// Table 63: Wheel Reference Speed Telemetry Format (ID: 196)
+// Frame Length: 4 bytes
+typedef struct __attribute__((packed)) {
+    float ReferenceSpeed;               // 32 bits, FLOAT, Unit: [RPM]
+} WheelReferenceSpeed_t;               // ID: 196
+
+// Table 64: Motor Power Telemetry Format (ID: 197)
+// Frame Length: 1 byte
+typedef struct __attribute__((packed)) {
+    bool MotorPowerSwitch : 1;          // bit 0, BOOL
+    uint8_t Reserved      : 7;          // bits 1-7, unused
+} MotorPowerTelemetry_t;               // ID: 197
+
+WheelReferenceTorque_t WheelReferenceTorque1, WheelReferenceTorque2;
+WheelSpeedTelemetry_t WheelSpeed1, WheelSpeed2;
+WheelReferenceSpeed_t WheelReferenceSpeed1, WheelReferenceSpeed2;
+MotorPowerTelemetry_t MotorPower1, MotorPower2;
 /* ------------- CubeWheel TCTLM ------------- */
 
 

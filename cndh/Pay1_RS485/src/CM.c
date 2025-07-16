@@ -145,8 +145,8 @@ void USART6_IRQHandler(void)
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define NODE_COUNT  3
-uint8_t tx_buffer[NODE_COUNT][7] = {
+#define NODE_COUNT  13
+uint8_t tx_buffer_TLM[NODE_COUNT][7] = {
     {ESC, SOM, 186, MainOBC, Magnetometer, ESC, EOM},       // CubeMag Config
     {ESC, SOM, 188, MainOBC, Magnetometer, ESC, EOM},       // All Service States
     {ESC, SOM, 190, MainOBC, Magnetometer, ESC, EOM},       // Deployment Status
@@ -163,14 +163,34 @@ uint8_t tx_buffer[NODE_COUNT][7] = {
     {ESC, SOM, 196, MainOBC, ReactionWheel2, ESC, EOM},
     {ESC, SOM, 197, MainOBC, ReactionWheel2, ESC, EOM},
 };
+
+uint8_t tx_buffer_TC[][8] = {
+    {ESC, SOM, 1, MainOBC, ReactionWheel1, 0, ESC, EOM},
+    {ESC, SOM, 1, MainOBC, ReactionWheel1, 55, ESC, EOM},
+    {ESC, SOM, 1, MainOBC, ReactionWheel1, 66, ESC, EOM},
+    {ESC, SOM, 6, MainOBC, ReactionWheel1, ?, ESC, EOM},
+    {ESC, SOM, 60, MainOBC, ReactionWheel1, 0, ESC, EOM},
+    {ESC, SOM, 60, MainOBC, ReactionWheel1, 1, ESC, EOM},
+}
+uint8_t tx_buffer_TC_NoData[][7] = {
+    {ESC, SOM, 5, MainOBC, ReactionWheel1, ESC, EOM},
+    {ESC, SOM, 62, MainOBC, ReactionWheel1, ESC, EOM},
+}
+
+
+uint8_t tx_buffer_ErrLogIndex = {ESC, SOM, 3, MainOBC, ReactionWheel1, ?, ?, ?, ?, ?, ESC, EOM};
+uint8_t tx_buffer_ErrLogEntry = {ESC, SOM, 4, MainOBC, ReactionWheel1, ?, ?, ?, ?, ?, ?, ?, ?, ESC, EOM};
+uint8_t tx_buffer_speed = {ESC, SOM, 64, MainOBC, ReactionWheel1, ?, ?, ?, ?, ESC, EOM};
+
+
+
+
+
 uint8_t rs485_rx_buffer[MAX_PACKET_LENGTH] = {0};
 static volatile uint8_t rs485_TxCplt_flag = 0;
 static volatile uint8_t rs485_RxCplt_flag = 0;
 //static uint16_t count = 0;
 uint8_t node_idx = 0;
-Primary primary;
-gain1 gain_CW1;
-gain2 gain_CW2;
 static uint16_t payload_size = 0;
 static uint16_t received_size = 0;
 static uint8_t write_idx = 5;
@@ -187,7 +207,7 @@ void RS485_TEST_Task(void *argument)
 {
     ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
     RS485_TxMode();
-    if (HAL_UART_Transmit_IT(&huart6, tx_buffer[node_idx], 7) != HAL_OK)
+    if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
     {
         ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
     }
@@ -225,7 +245,7 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
 
 
         RS485_TxMode();
-        if (HAL_UART_Transmit_IT(&huart6, tx_buffer[node_idx], 7) != HAL_OK)
+        if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
         {
      //       ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
         }
@@ -243,13 +263,42 @@ void DataParsing(uint8_t *data)
 
     if (data[3] == Magnetometer) {
         switch (data[2]) {
-            case 186:  // MainOBC
-    
+            case 186:  // CubeMag Config
+                memcpy(&CubeMagConfig, &data[5], sizeof(CubeMagConfig));
+                ES_TRACE_DEBUG(
+                    "CubeMag Config => Preferred Primary Mag: %d, Current Primary Mag: %d, "
+                    "Deploy Timeout: %d mS, Primary Auto-Select: %s\r\n",
+                    CubeMagConfig.PreferredPrimaryMagnetometer,
+                    CubeMagConfig.CurrentPrimaryMagnetometer,
+                    CubeMagConfig.DeployTimeout,
+                    CubeMagConfig.PrimaryAutoSelect ? "true" : "false"
+                );
                 break;
+                
             case 188:  // All Service States
+                memcpy(&AllServiceStates, &data[5], sizeof(AllServiceStates));
+                ES_TRACE_DEBUG(
+                    "All Service States => CubeMag: %d, Primary Magnetometer: %d, Redundant Magnetometer: %d\r\n",
+                    AllServiceStates.MagSvcState,
+                    AllServiceStates.PrimaryMagState,
+                    AllServiceStates.RedundantMagState
+                );
                 break;
+                
             case 190:  // Deployment Status
+                memcpy(&DeploymentStatus, &data[5], sizeof(DeploymentStatus));
+                ES_TRACE_DEBUG(
+                    "Deployment Status => BurnCurrent: %u mA, DeploymentPinState: %d, BurnPinState: %d, "
+                    "BurnUnderCurrent: %d, BurnOverCurrent: %d, DeploymentTimeout: %d\r\n",
+                    DeploymentStatus.BurnCurrent,
+                    DeploymentStatus.DeploymentPinState,
+                    DeploymentStatus.BurnPinState,
+                    DeploymentStatus.BurnUnderCurrent,
+                    DeploymentStatus.BurnOverCurrent,
+                    DeploymentStatus.DeploymentTimeout
+                );
                 break;
+                
             case 193:  // Redundant Magnetometer Measurement
                 memcpy(&Redundant, &data[5], sizeof(Redundant));
                 ES_TRACE_DEBUG(
@@ -260,6 +309,7 @@ void DataParsing(uint8_t *data)
                     Redundant.DataValid ? "true" : "false"
                 );
                 break;
+                
             case 197:  // Primary Magnetometer Measurement
                 memcpy(&primary, &data[5], sizeof(primary));
                 ES_TRACE_DEBUG(
@@ -270,7 +320,7 @@ void DataParsing(uint8_t *data)
                     primary.DataValid ? "true" : "false"
                 );
                 break;
-    
+
             default:
                 ES_TRACE_DEBUG("Unknown Node ID: %d\r\n", data[2]);
                 return;
@@ -278,25 +328,81 @@ void DataParsing(uint8_t *data)
     }
     else if (data[3] == ReactionWheel1) {
         switch (data[2]) {
-            case 186:
+            case 186:  // Wheel Reference Torque
+                memcpy(&WheelReferenceTorque1, &data[5], sizeof(WheelReferenceTorque1));
+                ES_TRACE_DEBUG(
+                    "Reaction Wheel 1 Reference Torque => %.4f mNm\r\n",
+                    WheelReferenceTorque1.ReferenceTorque
+                );
                 break;
-            case 188:
+                
+            case 188:  // Wheel Speed
+                memcpy(&WheelSpeed1, &data[5], sizeof(WheelSpeed1));
+                ES_TRACE_DEBUG(
+                    "Reaction Wheel 1 Speed => Speed: %.2f RPM, Error State: %d\r\n",
+                    WheelSpeed1.WheelSpeed,
+                    WheelSpeed1.WheelErrorState
+                );
                 break;
-            case 196:
+                
+            case 196:  // Wheel Reference Speed
+                memcpy(&WheelReferenceSpeed1, &data[5], sizeof(WheelReferenceSpeed1));
+                ES_TRACE_DEBUG(
+                    "Reaction Wheel 1 Reference Speed => %.2f RPM\r\n",
+                    WheelReferenceSpeed1.ReferenceSpeed
+                );
                 break;
-            case 197:
+                
+            case 197:  // Motor Power
+                memcpy(&MotorPower1, &data[5], sizeof(MotorPower1));
+                ES_TRACE_DEBUG(
+                    "Reaction Wheel 1 Motor Power => Switch: %s\r\n",
+                    MotorPower1.MotorPowerSwitch ? "ON" : "OFF"
+                );
+                break;
+                
+            default:
+                ES_TRACE_DEBUG("Unknown Reaction Wheel 1 Message ID: %d\r\n", data[2]);
                 break;
         }
     }
     else if (data[3] == ReactionWheel2) {
         switch (data[2]) {
-            case 186:
+            case 186:  // Wheel Reference Torque
+                memcpy(&WheelReferenceTorque2, &data[5], sizeof(WheelReferenceTorque2));
+                ES_TRACE_DEBUG(
+                    "Reaction Wheel 2 Reference Torque => %.4f mNm\r\n",
+                    WheelReferenceTorque2.ReferenceTorque
+                );
                 break;
-            case 188:
+                
+            case 188:  // Wheel Speed
+                memcpy(&WheelSpeed2, &data[5], sizeof(WheelSpeed2));
+                ES_TRACE_DEBUG(
+                    "Reaction Wheel 2 Speed => Speed: %.2f RPM, Error State: %d\r\n",
+                    WheelSpeed2.WheelSpeed,
+                    WheelSpeed2.WheelErrorState
+                );
                 break;
-            case 196:
+                
+            case 196:  // Wheel Reference Speed
+                memcpy(&WheelReferenceSpeed2, &data[5], sizeof(WheelReferenceSpeed2));
+                ES_TRACE_DEBUG(
+                    "Reaction Wheel 2 Reference Speed => %.2f RPM\r\n",
+                    WheelReferenceSpeed2.ReferenceSpeed
+                );
                 break;
-            case 197:
+                
+            case 197:  // Motor Power
+                memcpy(&MotorPower2, &data[5], sizeof(MotorPower2));
+                ES_TRACE_DEBUG(
+                    "Reaction Wheel 2 Motor Power => Switch: %s\r\n",
+                    MotorPower2.MotorPowerSwitch ? "ON" : "OFF"
+                );
+                break;
+                
+            default:
+                ES_TRACE_DEBUG("Unknown Reaction Wheel 2 Message ID: %d\r\n", data[2]);
                 break;
         }
     }
@@ -304,7 +410,6 @@ void DataParsing(uint8_t *data)
         ES_TRACE_DEBUG("Unknown address: %d\r\n", data[3]);
         return; 
     }
-
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)

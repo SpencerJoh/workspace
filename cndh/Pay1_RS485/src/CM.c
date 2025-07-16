@@ -164,23 +164,29 @@ uint8_t tx_buffer_TLM[NODE_COUNT][7] = {
     {ESC, SOM, 197, MainOBC, ReactionWheel2, ESC, EOM},
 };
 
-uint8_t tx_buffer_TC[][8] = {
-    {ESC, SOM, 1, MainOBC, ReactionWheel1, 0, ESC, EOM},
-    {ESC, SOM, 1, MainOBC, ReactionWheel1, 55, ESC, EOM},
-    {ESC, SOM, 1, MainOBC, ReactionWheel1, 66, ESC, EOM},
-    {ESC, SOM, 6, MainOBC, ReactionWheel1, ?, ESC, EOM},
-    {ESC, SOM, 60, MainOBC, ReactionWheel1, 0, ESC, EOM},
-    {ESC, SOM, 60, MainOBC, ReactionWheel1, 1, ESC, EOM},
-}
-uint8_t tx_buffer_TC_NoData[][7] = {
-    {ESC, SOM, 5, MainOBC, ReactionWheel1, ESC, EOM},
-    {ESC, SOM, 62, MainOBC, ReactionWheel1, ESC, EOM},
+uint8_t tx_buff_CMTC[][] = {
+    {ESC, SOM, }
 }
 
 
-uint8_t tx_buffer_ErrLogIndex = {ESC, SOM, 3, MainOBC, ReactionWheel1, ?, ?, ?, ?, ?, ESC, EOM};
-uint8_t tx_buffer_ErrLogEntry = {ESC, SOM, 4, MainOBC, ReactionWheel1, ?, ?, ?, ?, ?, ?, ?, ?, ESC, EOM};
-uint8_t tx_buffer_speed = {ESC, SOM, 64, MainOBC, ReactionWheel1, ?, ?, ?, ?, ESC, EOM};
+
+// uint8_t tx_buffer_TC[][8] = {
+//     {ESC, SOM, 1, MainOBC, ReactionWheel1, 0, ESC, EOM},
+//     {ESC, SOM, 1, MainOBC, ReactionWheel1, 55, ESC, EOM},
+//     {ESC, SOM, 1, MainOBC, ReactionWheel1, 66, ESC, EOM},
+//     {ESC, SOM, 6, MainOBC, ReactionWheel1, ?, ESC, EOM},
+//     {ESC, SOM, 60, MainOBC, ReactionWheel1, 0, ESC, EOM},
+//     {ESC, SOM, 60, MainOBC, ReactionWheel1, 1, ESC, EOM},
+// }
+// uint8_t tx_buffer_TC_NoData[][7] = {
+//     {ESC, SOM, 5, MainOBC, ReactionWheel1, ESC, EOM},
+//     {ESC, SOM, 62, MainOBC, ReactionWheel1, ESC, EOM},
+// }
+
+
+// uint8_t tx_buffer_ErrLogIndex = {ESC, SOM, 3, MainOBC, ReactionWheel1, ?, ?, ?, ?, ?, ESC, EOM};
+// uint8_t tx_buffer_ErrLogEntry = {ESC, SOM, 4, MainOBC, ReactionWheel1, ?, ?, ?, ?, ?, ?, ?, ?, ESC, EOM};
+// uint8_t tx_buffer_speed = {ESC, SOM, 64, MainOBC, ReactionWheel1, ?, ?, ?, ?, ESC, EOM};
 
 
 

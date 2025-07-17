@@ -164,8 +164,33 @@ uint8_t tx_buffer_TLM[NODE_COUNT][7] = {
     {ESC, SOM, 197, MainOBC, ReactionWheel2, ESC, EOM},
 };
 
-uint8_t tx_buff_CMTC[][] = {
-    {ESC, SOM, }
+
+
+
+
+uint8_t tx_buff_CMTC[11];
+
+CubeMagConfig_t CubeMagConfig_TC = {
+    .PreferredPrimaryMagnetometer = 0, // ENUM value for preferred primary magnetometer
+    .CurrentPrimaryMagnetometer   = 0, // ENUM value for current primary magnetometer
+    .DeployTimeout                = 3000, // Deployment timeout in milliseconds
+    .PrimaryAutoSelect            = 1, // Auto-select primary magnetometer enabled
+    .Reserved                     = 0  // Reserved bits set to zero
+};
+
+
+void build_tx_buffer_CMTC(void);
+
+void build_tx_buffer_CMTC(void)
+{
+    tx_buff_CMTC[0] = ESC;
+    tx_buff_CMTC[1] = SOM;
+    tx_buff_CMTC[2] = 60; // Command ID for CubeMag Config
+    tx_buff_CMTC[3] = MainOBC; // Source ID
+    tx_buff_CMTC[4] = Magnetometer; // Destination ID
+    memcpy(&tx_buff_CMTC[5], &CubeMagConfig_TC, sizeof(CubeMagConfig_TC));
+    tx_buff_CMTC[9] = ESC; // Escape character
+    tx_buff_CMTC[10] = EOM; // End of message
 }
 
 
@@ -217,6 +242,15 @@ void RS485_TEST_Task(void *argument)
     {
         ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
     }
+    
+    
+    /* for testing CM TC */
+    // build_tx_buffer_CMTC();
+    // if (HAL_UART_Transmit_IT(&huart6, tx_buff_CMTC, sizeof(tx_buff_CMTC)) != HAL_OK)
+    // {
+    //     ES_TRACE_DEBUG("TX Failed: CubeMag TC\n");
+    // }
+
 
     for (;;)
     {
@@ -269,15 +303,23 @@ void DataParsing(uint8_t *data)
 
     if (data[3] == Magnetometer) {
         switch (data[2]) {
+            case 60:
+            if data[5] == 0x00 {
+                ES_TRACE_DEBUG("CubeMag Config Command(ID: 60) Successful\r\n");
+            } else {
+                ES_TRACE_DEBUG("CubeMag Config Command(ID: 60) Failed with error code: %d\r\n", data[5]);
+            }
+            break;
+
             case 186:  // CubeMag Config
-                memcpy(&CubeMagConfig, &data[5], sizeof(CubeMagConfig));
+                memcpy(&CubeMagConfig_TLM, &data[5], sizeof(CubeMagConfig_TLM));
                 ES_TRACE_DEBUG(
                     "CubeMag Config => Preferred Primary Mag: %d, Current Primary Mag: %d, "
                     "Deploy Timeout: %d mS, Primary Auto-Select: %s\r\n",
-                    CubeMagConfig.PreferredPrimaryMagnetometer,
-                    CubeMagConfig.CurrentPrimaryMagnetometer,
-                    CubeMagConfig.DeployTimeout,
-                    CubeMagConfig.PrimaryAutoSelect ? "true" : "false"
+                    CubeMagConfig_TLM.PreferredPrimaryMagnetometer,
+                    CubeMagConfig_TLM.CurrentPrimaryMagnetometer,
+                    CubeMagConfig_TLM.DeployTimeout,
+                    CubeMagConfig_TLM.PrimaryAutoSelect ? "true" : "false"
                 );
                 break;
                 

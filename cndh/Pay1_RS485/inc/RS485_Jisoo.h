@@ -89,7 +89,8 @@ typedef struct __attribute__((packed)) {
     uint8_t Reserved                    : 7;     // bits 25-31, unused
 } CubeMagConfig_t;                              // ID: 186
 
-typedef CubeMagConfig_t CubeMagConfig;
+typedef CubeMagConfig_t CubeMagConfig_TLM;
+typedef CubeMagConfig_t CubeMagConfig_TC;
 
 
 typedef struct __attribute__((packed)) {    // padding 방지

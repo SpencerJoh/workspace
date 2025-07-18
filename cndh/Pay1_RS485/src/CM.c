@@ -191,6 +191,7 @@ CubeMagConfig_t CubeMagConfig_TC = {
 
 
 void build_tx_buffer_CMTC(void);
+void testing_CW_TC(void);
 
 void build_tx_buffer_CMTC(void)
 {
@@ -249,6 +250,8 @@ void RS485_TEST_Task(void *argument)
 {
     ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
     RS485_TxMode();
+    
+    /* for testing TLM */
     // if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
     // {
     //     ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
@@ -256,13 +259,15 @@ void RS485_TEST_Task(void *argument)
     
     
     /* for testing CM TC */
-    build_tx_buffer_CMTC();
-    if (HAL_UART_Transmit_IT(&huart6, tx_buff_CMTC, sizeof(tx_buff_CMTC)) != HAL_OK)
-    {
-        ES_TRACE_DEBUG("TX Failed: CubeMag TC\n");
-    }
+    // build_tx_buffer_CMTC();
+    // if (HAL_UART_Transmit_IT(&huart6, tx_buff_CMTC, sizeof(tx_buff_CMTC)) != HAL_OK)
+    // {
+    //     ES_TRACE_DEBUG("TX Failed: CubeMag TC\n");
+    // }
 
-
+    /* for testing CW TC */
+    testing_CW_TC();
+    
     for (;;)
     {
         RS485_ProcessEvents(&huart6);
@@ -278,8 +283,7 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
         RS485_RxMode();
         if (HAL_UART_Receive(&huart6, rs485_rx_buffer, MAX_PACKET_LENGTH, 50) == HAL_OK)          // goal for timeout is 50ms
         {
-    //       ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
-   //        ES_TRACE_DEBUG("UART RxState: %d, gState: %d\n", huart6.RxState, huart6.gState);
+            ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
         }
         HAL_UART_AbortReceive(&huart6);
         rs485_RxCplt_flag = 1;
@@ -298,7 +302,7 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
         RS485_TxMode();
         if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
         {
-     //       ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
+           ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
         }
 
     }

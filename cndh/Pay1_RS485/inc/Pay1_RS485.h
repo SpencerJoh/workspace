@@ -144,8 +144,6 @@ typedef struct __attribute__((packed)) {
 //     float Kd;
 // } MainGain_t; // ID: 193
 
-// typedef MainGain_t gain1;    // CW24307
-// typedef MainGain_t gain2;    // CW24308
 
 // Table 52: Wheel Reference Torque Telemetry Format (ID: 186)
 // Frame Length: 4 bytes

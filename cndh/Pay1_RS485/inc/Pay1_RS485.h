@@ -27,26 +27,26 @@
 #define MAX_PACKET_LENGTH 64
 
 
-typedef struct
-{
-    uint16_t      pin;
-    GPIO_TypeDef *port;
-} uart4_driver_pin;
+// typedef struct
+// {
+//     uint16_t      pin;
+//     GPIO_TypeDef *port;
+// } uart4_driver_pin;
 
-typedef struct
-{
-    uart4_driver_pin nRE;
-    uart4_driver_pin DE;
-    uart4_driver_pin TE;
-    uart4_driver_pin Tx;
-    uart4_driver_pin Rx;
-} uart4_driver_pins_t;
+// typedef struct
+// {
+//     uart4_driver_pin nRE;
+//     uart4_driver_pin DE;
+//     uart4_driver_pin TE;
+//     uart4_driver_pin Tx;
+//     uart4_driver_pin Rx;
+// } uart4_driver_pins_t;
 
-typedef struct
-{
-    uart4_driver_pin Tx;
-    uart4_driver_pin Rx;
-} uart4_ADCS_PILS_driver_pins_t;
+// typedef struct
+// {
+//     uart4_driver_pin Tx;
+//     uart4_driver_pin Rx;
+// } uart4_ADCS_PILS_driver_pins_t;
 
 
 typedef struct {
@@ -89,8 +89,6 @@ typedef struct __attribute__((packed)) {
     uint8_t Reserved                    : 7;     // bits 25-31, unused
 } CubeMagConfig_t;                              // ID: 186
 
-typedef CubeMagConfig_t CubeMagConfig_TLM;
-typedef CubeMagConfig_t CubeMagConfig_TC;
 
 
 typedef struct __attribute__((packed)) {    // padding 방지
@@ -99,10 +97,6 @@ typedef struct __attribute__((packed)) {    // padding 방지
     float Z_axis;
     bool DataValid;
 } MagnetometerMeasurement_t;
-
-typedef MagnetometerMeasurement_t Primary;        // ID: 197
-typedef MagnetometerMeasurement_t Redundant;      // ID: 193
-
 
 
 // Unit of measure: [mA]
@@ -117,7 +111,6 @@ typedef struct __attribute__((packed)) {
     // 나머지 3비트는 미사용
 } DeploymentStatus_t;               // ID: 190
 
-typedef DeploymentStatus_t DeploymentStatus;
 
 typedef enum {
     MAG_SVC_DEPLOY_ARM = 0,
@@ -141,7 +134,6 @@ typedef struct __attribute__((packed)) {
     MagnetometerState_t RedundantMagState;
 } AllServiceStates_t;                  // ID: 188
 
-typedef AllServiceStates_t AllServiceStates;
 
 /* ------------- CubeMag TCTLM ------------- */
 
@@ -181,12 +173,18 @@ typedef struct __attribute__((packed)) {
     uint8_t Reserved      : 7;          // bits 1-7, unused
 } MotorPowerTelemetry_t;               // ID: 197
 
-WheelReferenceTorque_t WheelReferenceTorque1, WheelReferenceTorque2;
-WheelSpeedTelemetry_t WheelSpeed1, WheelSpeed2;
-WheelReferenceSpeed_t WheelReferenceSpeed1, WheelReferenceSpeed2;
-MotorPowerTelemetry_t MotorPower1, MotorPower2;
 /* ------------- CubeWheel TCTLM ------------- */
+extern CubeMagConfig_t CubeMagConfig_TLM;
+extern CubeMagConfig_t CubeMagConfig_TC;
+extern MagnetometerMeasurement_t Primary;        // ID: 197
+extern MagnetometerMeasurement_t Redundant;      // ID: 193
+extern AllServiceStates_t AllServiceStates;
+extern DeploymentStatus_t DeploymentStatus;
 
+extern WheelReferenceTorque_t WheelReferenceTorque1, WheelReferenceTorque2;
+extern WheelSpeedTelemetry_t WheelSpeed1, WheelSpeed2;
+extern WheelReferenceSpeed_t WheelReferenceSpeed1, WheelReferenceSpeed2;
+extern MotorPowerTelemetry_t MotorPower1, MotorPower2;
 
 
 
@@ -196,6 +194,7 @@ MotorPowerTelemetry_t MotorPower1, MotorPower2;
 * \brief STM32 UART6 Interrupt handler callback
 */
 void USART6_IRQHandler(void);
+void convert_packet_1f1f_to_1f(uint8_t *data);
 
 void U6_RS485_Init(void);
 void RS485_TEST_Task(void *arg);

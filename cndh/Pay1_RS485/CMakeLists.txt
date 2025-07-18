@@ -1,5 +1,5 @@
-project(RS485_Jisoo C)
-set(make_target "RS485_Jisoo")
+project(Pay1_RS485 C)
+set(make_target "Pay1_RS485")
 
 include(${ROOT_BUILD_PATH}/espf.cmake)
 

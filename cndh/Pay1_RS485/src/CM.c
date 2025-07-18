@@ -1,4 +1,4 @@
-#include "../inc/RS485_Jisoo.h"
+#include "../inc/Pay1_RS485.h"
 INIT_CMP_LOGGER(true, TRACE_LVL_DEBUG)
 
 static UART_HandleTypeDef huart6 = { 0 };
@@ -144,6 +144,17 @@ void USART6_IRQHandler(void)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+CubeMagConfig_t CubeMagConfig_TLM;
+CubeMagConfig_t CubeMagConfig_TC;
+MagnetometerMeasurement_t Primary;        // ID: 197
+MagnetometerMeasurement_t Redundant;      // ID: 193
+AllServiceStates_t AllServiceStates;
+DeploymentStatus_t DeploymentStatus;
+
+WheelReferenceTorque_t WheelReferenceTorque1, WheelReferenceTorque2;
+WheelSpeedTelemetry_t WheelSpeed1, WheelSpeed2;
+WheelReferenceSpeed_t WheelReferenceSpeed1, WheelReferenceSpeed2;
+MotorPowerTelemetry_t MotorPower1, MotorPower2;
 
 #define NODE_COUNT  13
 uint8_t tx_buffer_TLM[NODE_COUNT][7] = {
@@ -173,7 +184,7 @@ uint8_t tx_buff_CMTC[11];
 CubeMagConfig_t CubeMagConfig_TC = {
     .PreferredPrimaryMagnetometer = 0, // ENUM value for preferred primary magnetometer
     .CurrentPrimaryMagnetometer   = 0, // ENUM value for current primary magnetometer
-    .DeployTimeout                = 3000, // Deployment timeout in milliseconds
+    .DeployTimeout                = 2999, // Deployment timeout in milliseconds
     .PrimaryAutoSelect            = 1, // Auto-select primary magnetometer enabled
     .Reserved                     = 0  // Reserved bits set to zero
 };
@@ -220,7 +231,7 @@ void build_tx_buffer_CMTC(void)
 uint8_t rs485_rx_buffer[MAX_PACKET_LENGTH] = {0};
 static volatile uint8_t rs485_TxCplt_flag = 0;
 static volatile uint8_t rs485_RxCplt_flag = 0;
-//static uint16_t count = 0;
+static uint16_t count = 0;
 uint8_t node_idx = 0;
 static uint16_t payload_size = 0;
 static uint16_t received_size = 0;
@@ -238,18 +249,18 @@ void RS485_TEST_Task(void *argument)
 {
     ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
     RS485_TxMode();
-    if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
-    {
-        ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
-    }
+    // if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
+    // {
+    //     ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
+    // }
     
     
     /* for testing CM TC */
-    // build_tx_buffer_CMTC();
-    // if (HAL_UART_Transmit_IT(&huart6, tx_buff_CMTC, sizeof(tx_buff_CMTC)) != HAL_OK)
-    // {
-    //     ES_TRACE_DEBUG("TX Failed: CubeMag TC\n");
-    // }
+    build_tx_buffer_CMTC();
+    if (HAL_UART_Transmit_IT(&huart6, tx_buff_CMTC, sizeof(tx_buff_CMTC)) != HAL_OK)
+    {
+        ES_TRACE_DEBUG("TX Failed: CubeMag TC\n");
+    }
 
 
     for (;;)
@@ -281,7 +292,7 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
         convert_packet_1f1f_to_1f(rs485_rx_buffer);
         DataParsing(rs485_rx_buffer);
         osDelay(50);                                // for controlling frequency
-        node_idx = (node_idx++) % NODE_COUNT;
+        node_idx = (node_idx + 1) % NODE_COUNT;
 
 
         RS485_TxMode();
@@ -295,7 +306,7 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
 
 void DataParsing(uint8_t *data)
 {
-    if (data[0] != ESC || data[1] != SOM)
+    if (data[0] != ESC || data[1] != SOR)
     {
         ES_TRACE_DEBUG("Invalid packet received.\r\n");
         return; // Exit if the packet is invalid
@@ -304,7 +315,7 @@ void DataParsing(uint8_t *data)
     if (data[3] == Magnetometer) {
         switch (data[2]) {
             case 60:
-            if data[5] == 0x00 {
+            if (data[5] == 0x00) {
                 ES_TRACE_DEBUG("CubeMag Config Command(ID: 60) Successful\r\n");
             } else {
                 ES_TRACE_DEBUG("CubeMag Config Command(ID: 60) Failed with error code: %d\r\n", data[5]);
@@ -359,13 +370,13 @@ void DataParsing(uint8_t *data)
                 break;
                 
             case 197:  // Primary Magnetometer Measurement
-                memcpy(&primary, &data[5], sizeof(primary));
+                memcpy(&Primary, &data[5], sizeof(Primary));
                 ES_TRACE_DEBUG(
                     "Primary Data [Magnetometer] => X: %.4f, Y: %.4f, Z: %.4f, Valid: %s\r\n",
-                    primary.X_axis,
-                    primary.Y_axis,
-                    primary.Z_axis,
-                    primary.DataValid ? "true" : "false"
+                    Primary.X_axis,
+                    Primary.Y_axis,
+                    Primary.Z_axis,
+                    Primary.DataValid ? "true" : "false"
                 );
                 break;
 

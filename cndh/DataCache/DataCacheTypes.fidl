@@ -232,3 +232,51 @@
 // id: 64
         Float ReferenceSpeed_2
     }
+
+
+
+    <** @description: Magnetometer **>
+    struct CubeMag_Telecommand
+    {
+// id: 1
+        <** @description: the type of reset to perform
+        0: Do Nothing, 55: Soft, 66: Hard
+        **>
+        UInt8 reset_type_2
+
+// id: 3
+        <** @description: the type of reset to perform
+        0: Reference Head, 1: Reference Tail
+        **>
+        UInt8 ErrorLog_IndexReference_2
+        UInt8 ErrorLog_IndexValue_2
+        UInt8 ErrorLog_Entries_2
+
+// id: 4
+        UInt32 ErrorLog_EntryTimestamp_2
+        UInt32 ErrorLog_EntryErrorCode_2
+
+// id: 5 -> No value
+
+// id: 6
+        <** @description: Active State, Buffer Full Action
+        Active State(bit:1) -> 0: Enabled(Logging is disabled), 1: Disabled(Logging is enabled)
+        Buffer Full Action(bit:1) -> 0: Ignore(Ignore new entries when buffer is full),
+                                     1: Erase(Erase log and new entry when buffer is full)
+        **>
+        UInt8 ErrorLogSettings_2
+
+// id: 60
+        <** @description: PreferredPrimaryMagnetometer(4bit), CurrentPrimaryMagnetometer(4bit)
+        0: PNI, 1: MMC **>       
+        UInt8 CubeMagConfigItems
+        UInt16 DeployTimeout
+
+        <** @description: Primary Auto-Select(1bit)**>
+        UInt8 Primary_AutoSelect
+
+// id: 63 -> No value        
+
+// id: 66
+        Float ReferenceSpeed_2
+    }

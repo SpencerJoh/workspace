@@ -32,3 +32,9 @@
 	    @details: id = 0x000000BF
     **>
     attribute CubeWheel2_Telecommand Wheelcommand2
+
+
+    <** @description: CubeMag ID: 1, 3, 4, 5, 6, 60, 63, 66
+	    @details: id = 0x000000C0
+    **>
+    attribute CubeMag_Telecommand Magcommand

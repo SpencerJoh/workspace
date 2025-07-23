@@ -15,6 +15,12 @@ static uart6_driver_pins_t U6_RS485_Driver_Pins = {
 static uint32_t baud_rates[] = { 9600, 115200, 230400, 460800, 921600, 2000000U, 3300000U };
 static uart6_driver_pins_t *p_U6_RS485_driver_Pins;
 static osThreadId_t RS485_TEST_Task_taskHandle;
+static osThreadId_t RS485_testing_task_taskHandle;
+static const osThreadAttr_t RS485_testing_task_attributes = {
+    .name = "RS485_testing_task",
+    .priority = (osPriority_t) osPriorityNormal,
+    .stack_size = 128 * 16
+};
 static const osThreadAttr_t RS485_TEST_Task_attributes = {
     .name = "RS485_TEST_Task",
     .priority = (osPriority_t) osPriorityNormal,
@@ -144,6 +150,8 @@ void USART6_IRQHandler(void)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+DATA_CACHE_CubeSpace_Telecommand_Flag_t tc_flag_copy = {0};
+
 CubeMagConfig_t CubeMagConfig_TLM;
 CubeMagConfig_t CubeMagConfig_TC;
 MagnetometerMeasurement_t Primary;        // ID: 197
@@ -207,26 +215,6 @@ void build_tx_buffer_CMTC(void)
 
 
 
-// uint8_t tx_buffer_TC[][8] = {
-//     {ESC, SOM, 1, MainOBC, ReactionWheel1, 0, ESC, EOM},
-//     {ESC, SOM, 1, MainOBC, ReactionWheel1, 55, ESC, EOM},
-//     {ESC, SOM, 1, MainOBC, ReactionWheel1, 66, ESC, EOM},
-//     {ESC, SOM, 6, MainOBC, ReactionWheel1, ?, ESC, EOM},
-//     {ESC, SOM, 60, MainOBC, ReactionWheel1, 0, ESC, EOM},
-//     {ESC, SOM, 60, MainOBC, ReactionWheel1, 1, ESC, EOM},
-// }
-// uint8_t tx_buffer_TC_NoData[][7] = {
-//     {ESC, SOM, 5, MainOBC, ReactionWheel1, ESC, EOM},
-//     {ESC, SOM, 62, MainOBC, ReactionWheel1, ESC, EOM},
-// }
-
-
-// uint8_t tx_buffer_ErrLogIndex = {ESC, SOM, 3, MainOBC, ReactionWheel1, ?, ?, ?, ?, ?, ESC, EOM};
-// uint8_t tx_buffer_ErrLogEntry = {ESC, SOM, 4, MainOBC, ReactionWheel1, ?, ?, ?, ?, ?, ?, ?, ?, ESC, EOM};
-// uint8_t tx_buffer_speed = {ESC, SOM, 64, MainOBC, ReactionWheel1, ?, ?, ?, ?, ESC, EOM};
-
-
-
 
 
 uint8_t rs485_rx_buffer[MAX_PACKET_LENGTH] = {0};
@@ -244,6 +232,17 @@ void U6_RS485_Init(void)
     p_U6_RS485_driver_Pins = &U6_RS485_Driver_Pins;
     uart6_init(baud_rates[4]);
     RS485_TEST_Task_taskHandle = osThreadNew(RS485_TEST_Task, NULL, &RS485_TEST_Task_attributes);
+    RS485_testing_task_taskHandle = osThreadNew(RS485_testing_task, NULL, &RS485_testing_task_attributes);
+}
+
+void RS485_testing_task(void *argument)
+{
+    ES_TRACE_DEBUG("========= RS485 testing task START ========= \r\n");
+    
+    for (;;)
+    {
+
+    }
 }
 
 void RS485_TEST_Task(void *argument)
@@ -251,11 +250,10 @@ void RS485_TEST_Task(void *argument)
     ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
     RS485_TxMode();
     
-    /* for testing TLM */
-    // if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
-    // {
-    //     ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
-    // }
+    if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
+    {
+        ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
+    }
     
     
     /* for testing CM TC */
@@ -266,7 +264,7 @@ void RS485_TEST_Task(void *argument)
     // }
 
     /* for testing CW TC */
-    testing_CW_TC();
+    // testing_CW_TC();
     
     for (;;)
     {
@@ -296,21 +294,97 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
         convert_packet_1f1f_to_1f(rs485_rx_buffer);
         DataParsing(rs485_rx_buffer);
         osDelay(50);                                // for controlling frequency
-        node_idx = (node_idx + 1) % NODE_COUNT;
         
         RS485_TxMode();
         
-        if () // Check telecommand flag 
+        if (check_all_flags_zero(&tc_flag_copy))
         {
+            ES_TRACE_DEBUG("All flags are zero, sending telemetry request\n");
+            node_idx = (node_idx + 1) % NODE_COUNT;
 
-        } else {
             if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
             {
                 ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
             }
+        } else {
+            send_telecommand(&tc_flag_copy);
         }
     }
 }
+
+
+
+uint8_t power_on_CW1[] = {ESC, SOM, 60, MainOBC, ReactionWheel1, 0x01, ESC, EOM};
+uint8_t power_off_CW1[] = {ESC, SOM, 60, MainOBC, ReactionWheel1, 0x00, ESC, EOM};
+uint8_t power_on_CW2[] = {ESC, SOM, 60, MainOBC, ReactionWheel2, 0x01, ESC, EOM};
+uint8_t power_off_CW2[] = {ESC, SOM, 60, MainOBC, ReactionWheel2, 0x00, ESC, EOM};
+
+
+
+void send_telecommand(DATA_CACHE_CubeSpace_Telecommand_Flag_t* flags) {
+
+    if (flags->u8CW1_TC_60)
+    {
+        if (HAL_UART_Transmit_IT(&huart6, power_on_CW1, sizeof(power_on_CW1)) != HAL_OK)
+        {
+            ES_TRACE_DEBUG("TX Failed: CubeWheel1 TC\n");
+        }
+        flags->u8CW1_TC_60 = 0;
+    } else if (flags->u8CW1_TC_64)
+    {
+        /* this code would be replaced by getting value from datacache */
+        float rpm = 100.0f; // Example RPM value
+        uint8_t tx_buff_CW_TC64[11] = {ESC, SOM, 64, MainOBC, ReactionWheel1, 0xF0, 0x02};
+        memcpy(&tx_buff_CW_TC64[5], &rpm, sizeof(float));
+        tx_buff_CW_TC64[9] = ESC;
+        tx_buff_CW_TC64[10] = EOM;
+        if (HAL_UART_Transmit_IT(&huart6, tx_buff_CW_TC64, sizeof(tx_buff_CW_TC64)) != HAL_OK)
+        {
+            ES_TRACE_DEBUG("TX Failed: CubeWheel1 TC for RPM\n");
+        }
+        flags->u8CW1_TC_64 = 0;
+    } else if (flags->u8CW2_TC_60)
+    {
+        if (HAL_UART_Transmit_IT(&huart6, power_on_CW2, sizeof(power_on_CW2)) != HAL_OK)
+        {
+            ES_TRACE_DEBUG("TX Failed: CubeWheel2 TC\n");
+        }
+        flags->u8CW2_TC_60 = 0;
+    } else if (flags->u8CW2_TC_64)
+    {
+        /* this code would be replaced by getting value from datacache */
+        float rpm = 100.0f; // Example RPM value
+        uint8_t tx_buff_CW_TC64[11] = {ESC, SOM, 64, MainOBC, ReactionWheel2, 0xF0, 0x02};
+        memcpy(&tx_buff_CW_TC64[5], &rpm, sizeof(float));
+        tx_buff_CW_TC64[9] = ESC;
+        tx_buff_CW_TC64[10] = EOM;
+        if (HAL_UART_Transmit_IT(&huart6, tx_buff_CW_TC64, sizeof(tx_buff_CW_TC64)) != HAL_OK)
+        {
+            ES_TRACE_DEBUG("TX Failed: CubeWheel1 TC for RPM\n");
+        }
+        flags->u8CW2_TC_64 = 0;
+    } else if (flags->u8CM_TC_60)
+    {
+        build_tx_buffer_CMTC();
+        if (HAL_UART_Transmit_IT(&huart6, tx_buff_CMTC, sizeof(tx_buff_CMTC)) != HAL_OK)
+        {
+            ES_TRACE_DEBUG("TX Failed: CubeMag TC\n");
+        }
+        flags->u8CM_TC_60 = 0;
+    } else {
+        ES_TRACE_DEBUG("No telecommand flags set.\n");
+    }
+    dc_set_tc_flag(&tc_flag_copy);
+}
+
+// tc_flags.CW2_TC_3 = 1;     // test 용 
+
+bool check_all_flags_zero(const DATA_CACHE_CubeSpace_Telecommand_Flag_t* flags) {
+    static const DATA_CACHE_CubeSpace_Telecommand_Flag_t zero_flags = {0};
+    dc_get_tc_flag(&tc_flag_copy);
+    return (memcmp(flags, &zero_flags, sizeof(DATA_CACHE_CubeSpace_Telecommand_Flag_t)) == 0);
+}
+
 
 void DataParsing(uint8_t *data)
 {

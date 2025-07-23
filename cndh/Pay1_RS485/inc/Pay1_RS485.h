@@ -49,37 +49,52 @@
 // } uart4_ADCS_PILS_driver_pins_t;
 
 
+
+/*
 typedef struct {
-    
-    bool CM_TC_1;
-    bool CM_TC_3;
-    bool CM_TC_4;
-    bool CM_TC_5;
-    bool CM_TC_6;
-    bool CM_TC_60;
-    bool CM_TC_63;
-    bool CM_TC_66;
+    uint8_t u8CM_TC_1;
+    uint8_t u8CM_TC_3;
+    uint8_t u8CM_TC_4;
+    uint8_t u8CM_TC_5;
+    uint8_t u8CM_TC_6;
+    uint8_t u8CM_TC_60;
+    uint8_t u8CM_TC_63;
+    uint8_t u8CM_TC_66;
+    uint8_t u8CW1_TC_1;
+    uint8_t u8CW1_TC_3;
+    uint8_t u8CW1_TC_4;
+    uint8_t u8CW1_TC_5;
+    uint8_t u8CW1_TC_6;
+    uint8_t u8CW1_TC_60;
+    uint8_t u8CW1_TC_62;
+    uint8_t u8CW1_TC_64;
+    uint8_t u8CW2_TC_1;
+    uint8_t u8CW2_TC_3;
+    uint8_t u8CW2_TC_4;
+    uint8_t u8CW2_TC_5;
+    uint8_t u8CW2_TC_6;
+    uint8_t u8CW2_TC_60;
+    uint8_t u8CW2_TC_62;
+    uint8_t u8CW2_TC_64;
+} PACKED_STRUCT DATA_CACHE_CubeSpace_Telecommand_Flag_t;
 
-    bool CW1_TC_1;
-    bool CW1_TC_3;
-    bool CW1_TC_4;
-    bool CW1_TC_5;
-    bool CW1_TC_6;
-    bool CW1_TC_60;
-    bool CW1_TC_62;
-    bool CW1_TC_64;
 
-    bool CW2_TC_1;
-    bool CW2_TC_3;
-    bool CW2_TC_4;
-    bool CW2_TC_5;
-    bool CW2_TC_6;
-    bool CW2_TC_60;
-    bool CW2_TC_62;
-    bool CW2_TC_64;
 
-} Telecommand_flag_CubeSpace_t;
+dc_data_status_t dc_get_tc_flag(DATA_CACHE_CubeSpace_Telecommand_Flag_t * const p_data)
+{
+    return dc_get_raw_data(DC_DID_TC_FLAG,
+                           p_data,
+                           sizeof(DATA_CACHE_CubeSpace_Telecommand_Flag_t),
+                           0U,
+                           sizeof(DATA_CACHE_CubeSpace_Telecommand_Flag_t));
+}
 
+void dc_set_tc_flag(DATA_CACHE_CubeSpace_Telecommand_Flag_t * const p_new_data)
+{
+    dc_set_raw_data(DC_DATA_INPUT_INTERNAL, DC_DID_TC_FLAG, p_new_data, sizeof(DATA_CACHE_CubeSpace_Telecommand_Flag_t));
+}
+*/
+extern DATA_CACHE_CubeSpace_Telecommand_Flag_t tc_flag_copy;
 
 
 
@@ -172,12 +187,6 @@ typedef struct __attribute__((packed)) {
 /* ------------- CubeMag TCTLM ------------- */
 
 /* ------------- CubeWheel TCTLM ------------- */
-// typedef struct {
-//     float Kp;
-//     float Ki;
-//     float Kd;
-// } MainGain_t; // ID: 193
-
 
 // Table 52: Wheel Reference Torque Telemetry Format (ID: 186)
 // Frame Length: 4 bytes
@@ -206,6 +215,8 @@ typedef struct __attribute__((packed)) {
 } MotorPowerTelemetry_t;               // ID: 197
 
 /* ------------- CubeWheel TCTLM ------------- */
+extern Telecommand_flag_CubeSpace_t tc_flags;
+
 extern CubeMagConfig_t CubeMagConfig_TLM;
 extern CubeMagConfig_t CubeMagConfig_TC;
 extern MagnetometerMeasurement_t Primary;        // ID: 197
@@ -227,7 +238,7 @@ extern MotorPowerTelemetry_t MotorPower1, MotorPower2;
 */
 void USART6_IRQHandler(void);
 void convert_packet_1f1f_to_1f(uint8_t *data);
-
+bool check_all_flags_zero(const DATA_CACHE_CubeSpace_Telecommand_Flag_t* flags);
 void U6_RS485_Init(void);
 void RS485_TEST_Task(void *arg);
 void RS485_ProcessEvents(UART_HandleTypeDef *huart);

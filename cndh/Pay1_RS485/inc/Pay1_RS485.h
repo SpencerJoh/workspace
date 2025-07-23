@@ -50,6 +50,40 @@
 
 
 typedef struct {
+    
+    bool CM_TC_1;
+    bool CM_TC_3;
+    bool CM_TC_4;
+    bool CM_TC_5;
+    bool CM_TC_6;
+    bool CM_TC_60;
+    bool CM_TC_63;
+    bool CM_TC_66;
+
+    bool CW1_TC_1;
+    bool CW1_TC_3;
+    bool CW1_TC_4;
+    bool CW1_TC_5;
+    bool CW1_TC_6;
+    bool CW1_TC_60;
+    bool CW1_TC_62;
+    bool CW1_TC_64;
+
+    bool CW2_TC_1;
+    bool CW2_TC_3;
+    bool CW2_TC_4;
+    bool CW2_TC_5;
+    bool CW2_TC_6;
+    bool CW2_TC_60;
+    bool CW2_TC_62;
+    bool CW2_TC_64;
+
+} Telecommand_flag_CubeSpace_t;
+
+
+
+
+typedef struct {
     uint16_t pin;
     GPIO_TypeDef *port;
 } uart6_driver_pin;

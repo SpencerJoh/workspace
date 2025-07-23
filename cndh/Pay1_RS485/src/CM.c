@@ -297,14 +297,18 @@ void RS485_ProcessEvents(UART_HandleTypeDef *huart)
         DataParsing(rs485_rx_buffer);
         osDelay(50);                                // for controlling frequency
         node_idx = (node_idx + 1) % NODE_COUNT;
-
-
+        
         RS485_TxMode();
-        if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
+        
+        if () // Check telecommand flag 
         {
-           ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
-        }
 
+        } else {
+            if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
+            {
+                ES_TRACE_DEBUG("!!!!!! TX Failed !!!!!!\n");
+            }
+        }
     }
 }
 

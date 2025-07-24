@@ -248,14 +248,15 @@ void U6_RS485_Init(void)
 void RS485_TEST_Task(void *argument)
 {
     ES_TRACE_DEBUG("========= RS485_TEST_Task START ========= \r\n");
-    RS485_TxMode();
-    
-    // if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
-    // {
-    //     ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
-    // }
     
     testing_TC();
+    
+    RS485_TxMode();
+    
+    if (HAL_UART_Transmit_IT(&huart6, tx_buffer_TLM[node_idx], 7) != HAL_OK)
+    {
+        ES_TRACE_DEBUG("TX Failed: node %d\n", node_idx);
+    }
     
     for (;;)
     {
@@ -308,6 +309,7 @@ void testing_TC(void)
 {
     /* =========================================== 1 =========================================== */
     /* for testing CM TC */
+    RS485_TxMode();
     build_tx_buffer_CMTC();
     if (HAL_UART_Transmit_IT(&huart6, tx_buff_CMTC, sizeof(tx_buff_CMTC)) != HAL_OK)
     {
@@ -393,7 +395,7 @@ void testing_TC(void)
 
     /* =========================================== 4 =========================================== */
     RS485_TxMode();
-    if (HAL_UART_Transmit_IT(&huart6, tx_buff_CW1_TC64, sizeof(tx_buff_CW_TC64)) != HAL_OK)
+    if (HAL_UART_Transmit_IT(&huart6, tx_buff_CW1_TC64, sizeof(tx_buff_CW1_TC64)) != HAL_OK)
     {
         ES_TRACE_DEBUG("TX Failed: CubeWheel1 TC for 100RPM\n");
     }
@@ -414,16 +416,116 @@ void testing_TC(void)
 
     /* =========================================== 5 =========================================== */
     RS485_TxMode();
-
-
-
+    if (HAL_UART_Transmit_IT(&huart6, tx_buff_CW2_TC64, sizeof(tx_buff_CW2_TC64)) != HAL_OK)
+    {
+        ES_TRACE_DEBUG("TX Failed: CubeWheel2 TC for 100RPM\n");
+    }
+    RS485_RxMode();
+    if (HAL_UART_Receive(&huart6, rs485_rx_buffer, MAX_PACKET_LENGTH, 50) == HAL_OK)          // goal for timeout is 50ms
+    {
+        ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
+    }
+    HAL_UART_AbortReceive(&huart6);
+    if (data[5] == 0x00) {
+        ES_TRACE_DEBUG("CubeWheel2 TC Command(ID: 64) Successful\r\n");
+    } else if (data[5] == 0x01) {
+        ES_TRACE_DEBUG("CubeWheel2 TC Command(ID: 64) Failed with error code: %d\r\n", data[5]);
+    } else {
+        ES_TRACE_DEBUG("CubeWheel2 TC Command(ID: 64) Unknown response code: %d\r\n", data[5]);
+    }
+    
 
     /* =========================================== 6 =========================================== */
-    /* =========================================== 7 =========================================== */
-    /* =========================================== 8 =========================================== */
-    /* =========================================== 9 =========================================== */
-    /* =========================================== 10 =========================================== */
+    for (int i = 0; i < 10; i++) {
+        osDelay(1000);
+        ES_TRACE_DEBUG("Waiting for 1 second... %d\r\n", i + 1);
+    }
+    rpm = 0.0f; // Reset RPM for next test
+    memcpy(&tx_buff_CW1_TC64[5], &rpm, sizeof(rpm));  // 5~8에 rpm 삽입
+    memcpy(&tx_buff_CW2_TC64[5], &rpm, sizeof(rpm));  // 5~8에 rpm 삽입
 
+
+    /* =========================================== 7 =========================================== */
+    RS485_TxMode();
+    RS485_TxMode();
+    if (HAL_UART_Transmit_IT(&huart6, tx_buff_CW1_TC64, sizeof(tx_buff_CW1_TC64)) != HAL_OK)
+    {
+        ES_TRACE_DEBUG("TX Failed: CubeWheel1 TC for 0 RPM\n");
+    }
+    RS485_RxMode();
+    if (HAL_UART_Receive(&huart6, rs485_rx_buffer, MAX_PACKET_LENGTH, 50) == HAL_OK)          // goal for timeout is 50ms
+    {
+        ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
+    }
+    HAL_UART_AbortReceive(&huart6);
+    if (data[5] == 0x00) {
+        ES_TRACE_DEBUG("CubeWheel1 TC Command(ID: 64) Successful\r\n");
+    } else if (data[5] == 0x01) {
+        ES_TRACE_DEBUG("CubeWheel1 TC Command(ID: 64) Failed with error code: %d\r\n", data[5]);
+    } else {
+        ES_TRACE_DEBUG("CubeWheel1 TC Command(ID: 64) Unknown response code: %d\r\n", data[5]);
+    }
+
+    
+    /* =========================================== 8 =========================================== */
+    RS485_TxMode();
+    if (HAL_UART_Transmit_IT(&huart6, tx_buff_CW2_TC64, sizeof(tx_buff_CW2_TC64)) != HAL_OK)
+    {
+        ES_TRACE_DEBUG("TX Failed: CubeWheel2 TC for 0 RPM\n");
+    }
+    RS485_RxMode();
+    if (HAL_UART_Receive(&huart6, rs485_rx_buffer, MAX_PACKET_LENGTH, 50) == HAL_OK)          // goal for timeout is 50ms
+    {
+        ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
+    }
+    HAL_UART_AbortReceive(&huart6);
+    if (data[5] == 0x00) {
+        ES_TRACE_DEBUG("CubeWheel2 TC Command(ID: 64) Successful\r\n");
+    } else if (data[5] == 0x01) {
+        ES_TRACE_DEBUG("CubeWheel2 TC Command(ID: 64) Failed with error code: %d\r\n", data[5]);
+    } else {
+        ES_TRACE_DEBUG("CubeWheel2 TC Command(ID: 64) Unknown response code: %d\r\n", data[5]);
+    }
+
+
+    /* =========================================== 9 =========================================== */
+    RS485_TxMode();
+    if (HAL_UART_Transmit_IT(&huart6, power_off_CW1, sizeof(power_off_CW1)) != HAL_OK)
+    {
+        ES_TRACE_DEBUG("TX Failed: CubeWheel1 TC\n");
+    }
+
+    RS485_RxMode();
+    if (HAL_UART_Receive(&huart6, rs485_rx_buffer, MAX_PACKET_LENGTH, 50) == HAL_OK)          // goal for timeout is 50ms
+    {
+        ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
+    }
+    HAL_UART_AbortReceive(&huart6);
+    if (data[5] == 0x00) {
+        ES_TRACE_DEBUG("CubeWheel1 TC Command(ID: 60) Successful\r\n");
+    } else {
+        ES_TRACE_DEBUG("CubeWheel1 TC Command(ID: 60) Failed with error code: %d\r\n", data[5]);
+    }
+
+
+    /* =========================================== 10 =========================================== */
+    RS485_TxMode();
+    if (HAL_UART_Transmit_IT(&huart6, power_off_CW2, sizeof(power_off_CW2)) != HAL_OK)
+    {
+        ES_TRACE_DEBUG("TX Failed: CubeWheel2 TC\n");
+    }
+
+    RS485_RxMode();
+    if (HAL_UART_Receive(&huart6, rs485_rx_buffer, MAX_PACKET_LENGTH, 50) == HAL_OK)          // goal for timeout is 50ms
+    {
+        ES_TRACE_DEBUG("!!!!!! RX Failed !!!!!!\n");
+    }
+    HAL_UART_AbortReceive(&huart6);
+    if (data[5] == 0x00) {
+        ES_TRACE_DEBUG("CubeWheel2 TC Command(ID: 60) Successful\r\n");
+    } else {
+        ES_TRACE_DEBUG("CubeWheel2 TC Command(ID: 60) Failed with error code: %d\r\n", data[5]);
+    }
 
 
     // if ((rs485_rx_buffer[5] == 0x00) || (rs485_rx_buffer[5] == 0x01)) {

@@ -241,6 +241,9 @@ typedef enum
 #define DC_ATTR_ID_ADCS_RESULT 0x000000BB
 #define DC_ATTR_ID_ADCS_HW 0x000000BC
 #define DC_ATTR_ID_TC_FLAG 0x000000BD
+#define DC_ATTR_ID_WHEELCOMMAND1 0x000000BE
+#define DC_ATTR_ID_WHEELCOMMAND2 0x000000BF
+#define DC_ATTR_ID_MAGCOMMAND 0x000000C0
 
 
 typedef struct {
@@ -2907,6 +2910,53 @@ typedef struct {
     uint8_t u8CW2_TC_64;
 } PACKED_STRUCT DATA_CACHE_CubeSpace_Telecommand_Flag_t;
 
+/*
+    Reaction Wheel 1
+*/
+typedef struct {
+    uint8_t u8Reset_type_1;
+    uint8_t u8ErrorLog_IndexReference_1;
+    uint8_t u8ErrorLog_IndexValue_1;
+    uint8_t u8ErrorLog_Entries_1;
+    uint32_t u32ErrorLog_EntryTimestamp_1;
+    uint32_t u32ErrorLog_EntryErrorCode_1;
+    uint8_t u8ErrorLogSettings_1;
+    bool bMotorPowerSwitch_1;
+    float fReferenceSpeed_1;
+} PACKED_STRUCT DATA_CACHE_CubeWheel1_Telecommand_t;
+
+/*
+    Reaction Wheel 2
+*/
+typedef struct {
+    uint8_t u8Reset_type_2;
+    uint8_t u8ErrorLog_IndexReference_2;
+    uint8_t u8ErrorLog_IndexValue_2;
+    uint8_t u8ErrorLog_Entries_2;
+    uint32_t u32ErrorLog_EntryTimestamp_2;
+    uint32_t u32ErrorLog_EntryErrorCode_2;
+    uint8_t u8ErrorLogSettings_2;
+    bool bMotorPowerSwitch_2;
+    float fReferenceSpeed_2;
+} PACKED_STRUCT DATA_CACHE_CubeWheel2_Telecommand_t;
+
+/*
+    Magnetometer
+*/
+typedef struct {
+    uint8_t u8Reset_type_2;
+    uint8_t u8ErrorLog_IndexReference_2;
+    uint8_t u8ErrorLog_IndexValue_2;
+    uint8_t u8ErrorLog_Entries_2;
+    uint32_t u32ErrorLog_EntryTimestamp_2;
+    uint32_t u32ErrorLog_EntryErrorCode_2;
+    uint8_t u8ErrorLogSettings_2;
+    uint8_t u8CubeMagConfigItems;
+    uint16_t u16DeployTimeout;
+    uint8_t u8Primary_AutoSelect;
+    float fReferenceSpeed_2;
+} PACKED_STRUCT DATA_CACHE_CubeMag_Telecommand_t;
+
 
 // Enum type to access the datacache structure with the index
 typedef enum
@@ -3100,6 +3150,9 @@ typedef enum
     DC_DID_ADCS_RESULT,
     DC_DID_ADCS_HW,
     DC_DID_TC_FLAG,
+    DC_DID_WHEELCOMMAND1,
+    DC_DID_WHEELCOMMAND2,
+    DC_DID_MAGCOMMAND,
     DC_DID_MAX
 } dc_did_id;
 
@@ -3687,6 +3740,15 @@ void dc_set_adcs_hw(DATA_CACHE_ADCS_HW_type_t * const p_new_data);
 
 dc_data_status_t dc_get_tc_flag(DATA_CACHE_CubeSpace_Telecommand_Flag_t * const p_data);
 void dc_set_tc_flag(DATA_CACHE_CubeSpace_Telecommand_Flag_t * const p_new_data);
+
+dc_data_status_t dc_get_wheelcommand1(DATA_CACHE_CubeWheel1_Telecommand_t * const p_data);
+void dc_set_wheelcommand1(DATA_CACHE_CubeWheel1_Telecommand_t * const p_new_data);
+
+dc_data_status_t dc_get_wheelcommand2(DATA_CACHE_CubeWheel2_Telecommand_t * const p_data);
+void dc_set_wheelcommand2(DATA_CACHE_CubeWheel2_Telecommand_t * const p_new_data);
+
+dc_data_status_t dc_get_magcommand(DATA_CACHE_CubeMag_Telecommand_t * const p_data);
+void dc_set_magcommand(DATA_CACHE_CubeMag_Telecommand_t * const p_new_data);
 
 
 /*!

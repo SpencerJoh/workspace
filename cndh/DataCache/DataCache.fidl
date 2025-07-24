@@ -1,3 +1,857 @@
+package endurosat.pf.DataCache
+
+import endurosat.pf.DataCacheTypes.* from "DataCacheTypes.fidl"
+
+interface data_cache
+{
+    version { major 0 minor 1 }
+
+    <** @description: Onboard Computer TLM Message 0
+        @details: id = 0x00000001
+    **>
+    attribute OBC_0 OBC_0_Data
+
+    <** @description: CubeADCS TLM Message 0
+        - CubeADCS TLM191
+        @details: id = 0x00000002
+    **>
+    attribute ADCS_0 ADCS_0_Data
+
+    <** @description: CubeADCS TLM Message 1
+        - CubeADCS TLM218
+        - CubeADCS TLM147
+        @details: id = 0x00000003
+    **>
+    attribute ADCS_1 ADCS_1_Data
+
+    <** @description: CubeADCS TLM Message 2
+        - CubeADCS TLM140
+        @details: id = 0x00000004
+    **>
+    attribute ADCS_2 ADCS_2_Data
+
+    <** @description: EPS II TLM Message 0
+        @details: id = 0x00000005
+    **>
+    attribute EPS_0 EPS_0_Data
+
+    <** @description: Smart Solar Panels TLM Message 0 (First 6U dove panel Y+)
+        - Panel 1 Data (axis is satellite dependent)
+        @details: id = 0x00000006
+    **>
+    attribute SSP_0_Telemetry SSP_0_Data
+
+    <** @description: Smart Solar Panels TLM Message 1 (Second 6U dove panel Y-)
+        - Panel 2 Data (axis is satellite dependent)
+        @details: id = 0x00000007
+    **>
+    attribute SSP_1_Telemetry SSP_1_Data
+
+    <** @description: Smart Solar Panels TLM Message 2 (3U MCU Solar Panel X-)
+        - Panel 3 Data (axis is satellite dependent)
+        @details: id = 0x00000008
+    **>
+    attribute SSP_2_Telemetry SSP_2_Data
+
+    <** @description: Smart Solar Panels TLM Message 4 (2U MCU Solar Panel Z-)
+        - Panel 4 Data (axis is satellite dependent)
+        @details: id = 0x00000009
+    **>
+    attribute SSP_3_Telemetry SSP_3_Data
+
+    <** @description: AOCS Control TLM Message
+        @details: id = 0x0000000A
+    **>
+    attribute AOCS_CNTRL_TLM AOCS_CNTRL_TLM_Data
+
+    <** @description: AOCS System State TLM and CNTRL
+        @details: id = 0x0000000B
+    **>
+    attribute AOCS_CNTRL_SYS_STATE AOCS_CNTRL_SYS_STATE_Data
+
+    <** @description: Reference params for AOCS control modes
+        @details: id = 0x0000000C
+    **>
+    attribute AOCS_CNTRL_REF_PARAMS AOCS_CNTRL_REF_PARAMS_Data
+
+    <** @description: Raw Gyroscope Measurements in Sensor Frame
+        @details: id = 0x0000000D
+    **>
+    attribute SENSOR_GYRO_SENSOR_FRAME SENSOR_GYRO_SENSOR_FRAME_Data
+
+    <** @description: Raw Gyroscope Measurements in Body Frame
+        @details: id = 0x0000000E
+    **>
+    attribute SENSOR_GYRO_BODY_FRAME SENSOR_GYRO_BODY_FRAME_Data
+
+    <** @description: Raw Primary Magnetometer Measurements in Sensor Frame
+        @details: id = 0x0000000F
+    **>
+    attribute SENSOR_MAG_PRIMARY_SENSOR_FRAME SENSOR_MAG_PRIMARY_SENSOR_FRAME_Data
+
+    <** @description: Raw Primary Magnetometer Measurements in Body Frame
+        @details: id = 0x00000010
+    **>
+    attribute SENSOR_MAG_PRIMARY_BODY_FRAME SENSOR_MAG_PRIMARY_BODY_FRAME_Data
+
+    <** @description: Raw Secondary Magnetometer Measurements in Sensor Frame
+        @details: id = 0x00000011
+    **>
+    attribute SENSOR_MAG_SECONDARY_SENSOR_FRAME SENSOR_MAG_SECONDARY_SENSOR_FRAME_Data
+
+    <** @description: Raw Secondary Magnetometer Measurements in Body Frame
+        @details: id = 0x00000012
+    **>
+    attribute SENSOR_MAG_SECONDARY_BODY_FRAME SENSOR_MAG_SECONDARY_BODY_FRAME_Data
+
+    <** @description: Raw Coarse Sun Sensor Measurements in Sensor Frame
+        @details: id = 0x00000013
+    **>
+    attribute SENSOR_COARSE_SUN_SENSOR_FRAME SENSOR_COARSE_SUN_SENSOR_FRAME_Data
+
+    <** @description: Raw Photosensor Measurements in Body Frame
+        @details: id = 0x00000014
+    **>
+    attribute SENSOR_COARSE_SUN_BODY_FRAME SENSOR_COARSE_SUN_BODY_FRAME_Data
+
+    <** @description: Raw Panels Temperature Measurements in Sensor Frame
+        @details: id = 0x00000015
+    **>
+    attribute SENSOR_PANEL_TEMP_SENSOR_FRAME SENSOR_PANEL_TEMP_SENSOR_FRAME_Data
+
+    <** @description: Raw Panels Temperature Measurements in Body Frame
+        @details: id = 0x00000016
+    **>
+    attribute SENSOR_PANEL_TEMP_BODY_FRAME SENSOR_PANEL_TEMP_BODY_FRAME_Data
+
+    <** @description: Raw Gyroscopes Temperature Measurements in Sensor Frame
+        @details: id = 0x00000017
+    **>
+    attribute SENSOR_GYRO_TEMP_SENSOR_FRAME SENSOR_GYRO_TEMP_SENSOR_FRAME_Data
+
+    <** @description: Raw Gyroscopes Temperature Measurements in Body Frame
+        @details: id = 0x00000018
+    **>
+    attribute SENSOR_GYRO_TEMP_BODY_FRAME SENSOR_GYRO_TEMP_BODY_FRAME_Data
+
+    <** @description: Magnetorquer hardware signal values in Body Frame
+        @details: id = 0x00000019
+    **>
+    attribute ACTUATOR_MTQ_VALUES ACTUATOR_MTQ_VALUES_Data
+
+    <** @description: Desired control torque of the actuators in Body Frame
+        @details: id = 0x0000001A
+    **>
+    attribute ACTUATOR_TORQUE_VALUES ACTUATOR_TORQUE_VALUES_Data
+
+    <** @description: CubeADCS TLM Message 3
+        @details: id = 0x0000001B
+    **>
+    attribute ADCS_3 ADCS_3_Data
+
+    <** @description: CubeADCS TLM Message 4
+        @details: id = 0x0000001C
+    **>
+    attribute ADCS_4 ADCS_4_Data
+
+    <** @description: GetPowerDistributionInfo from EPSII_PDM_1 interface
+        @details: id = 0x0000001D
+    **>
+    attribute EPS_9 EPS_9_Data
+
+    <** @description: GetDeviceHealthInfo from EPSII_PDM_1 interface
+        @details: id = 0x0000001E
+    **>
+    attribute EPS_10 EPS_10_Data
+
+    <** @description: GetRAWSensors from EPSII_PDM_1 interface (Indexes 1-54)
+        @details: id = 0x0000001F
+    **>
+    attribute EPS_14 EPS_14_Data
+
+    <** @description: CubeADCS Gen2 Operational Status Common
+        @details: id = 0x00000020
+    **>
+    attribute CUBEADCS_GEN2_OP_STATUS_COMMON CUBEADCS_GEN2_OP_STATUS_COMMON_Data
+
+    <** @description: CubeADCS Gen2 Operational Status Application Control Program
+        @details: id = 0x00000021
+    **>
+    attribute CUBEADCS_GEN2_OP_STATUS_APP CUBEADCS_GEN2_OP_STATUS_APP_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 166
+        @details: id = 0x00000022
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_166 CUBEADCS_GEN2_TLM_FRAME_166_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 167
+        @details: id = 0x00000023
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_167 CUBEADCS_GEN2_TLM_FRAME_167_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 168
+        @details: id = 0x00000024
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_168 CUBEADCS_GEN2_TLM_FRAME_168_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 169
+        @details: id = 0x00000025
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_169 CUBEADCS_GEN2_TLM_FRAME_169_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 170
+        @details: id = 0x00000026
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_170 CUBEADCS_GEN2_TLM_FRAME_170_Data    
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 171
+        @details: id = 0x00000027
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_171 CUBEADCS_GEN2_TLM_FRAME_171_Data  
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 172
+        @details: id = 0x00000028
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_172 CUBEADCS_GEN2_TLM_FRAME_172_Data  
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 173
+        @details: id = 0x00000029
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_173 CUBEADCS_GEN2_TLM_FRAME_173_Data  
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 174
+        @details: id = 0x0000002A
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_174 CUBEADCS_GEN2_TLM_FRAME_174_Data  
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 175
+        @details: id = 0x0000002B
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_175 CUBEADCS_GEN2_TLM_FRAME_175_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 176
+        @details: id = 0x0000002C
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_176 CUBEADCS_GEN2_TLM_FRAME_176_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 177
+        @details: id = 0x0000002D
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_177 CUBEADCS_GEN2_TLM_FRAME_177_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 178
+        @details: id = 0x0000002E
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_178 CUBEADCS_GEN2_TLM_FRAME_178_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 179
+        @details: id = 0x0000002F
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_179 CUBEADCS_GEN2_TLM_FRAME_179_Data    
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 180
+        @details: id = 0x00000030
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_180 CUBEADCS_GEN2_TLM_FRAME_180_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 203
+        @details: id = 0x00000031
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_203 CUBEADCS_GEN2_TLM_FRAME_203_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 204
+        @details: id = 0x00000032
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_204 CUBEADCS_GEN2_TLM_FRAME_204_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 205
+        @details: id = 0x00000033
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_205 CUBEADCS_GEN2_TLM_FRAME_205_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 206
+        @details: id = 0x00000034
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_206 CUBEADCS_GEN2_TLM_FRAME_206_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 207
+        @details: id = 0x00000035
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_207 CUBEADCS_GEN2_TLM_FRAME_207_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 208 - Part 1
+        @details: id = 0x00000036
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_208_1 CUBEADCS_GEN2_TLM_FRAME_208_1_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 208 - Part 2
+        @details: id = 0x00000037
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_208_2 CUBEADCS_GEN2_TLM_FRAME_208_2_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 209
+        @details: id = 0x00000038
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_209 CUBEADCS_GEN2_TLM_FRAME_209_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 210
+        @details: id = 0x00000039
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_210 CUBEADCS_GEN2_TLM_FRAME_210_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 211
+        @details: id = 0x0000003A
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_211 CUBEADCS_GEN2_TLM_FRAME_211_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 212
+        @details: id = 0x0000003B
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_212 CUBEADCS_GEN2_TLM_FRAME_212_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 213
+        @details: id = 0x0000003C
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_213 CUBEADCS_GEN2_TLM_FRAME_213_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 214
+        @details: id = 0x0000003D
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_214 CUBEADCS_GEN2_TLM_FRAME_214_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 216
+        @details: id = 0x0000003E
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_216 CUBEADCS_GEN2_TLM_FRAME_216_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 217
+        @details: id = 0x0000003F
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_217 CUBEADCS_GEN2_TLM_FRAME_217_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 218
+        @details: id = 0x00000040
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_218 CUBEADCS_GEN2_TLM_FRAME_218_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 225
+        @details: id = 0x00000041
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_225 CUBEADCS_GEN2_TLM_FRAME_225_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 226
+        @details: id = 0x00000042
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_226 CUBEADCS_GEN2_TLM_FRAME_226_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 165
+        @details: id = 0x00000043
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_165 CUBEADCS_GEN2_TLM_FRAME_165_Data
+
+    <** @description: CubeADCS Gen2 Telemetry Frame 221
+        @details: id = 0x00000044
+    **>
+    attribute CUBEADCS_GEN2_TLM_FRAME_221 CUBEADCS_GEN2_TLM_FRAME_221_Data
+
+    <** @description: GNSS TIME log
+        @details: id = 0x00000045
+    **>
+    attribute GNSS_TIME GNSS_TIME_Data
+
+    <** @description: GNSS BESTXYZ log
+        @details: id = 0x00000046
+    **>
+    attribute GNSS_BESTXYZ GNSS_BESTXYZ_Data
+
+    <** @description: Satellite state vector obtained from an onboard propagator
+        @details: id = 0x00000047
+    **>
+    attribute SAT_STATE_VECTOR_FROM_PROPAGATOR SAT_STATE_VECTOR_FROM_PROPAGATOR_Data
+
+    <** @description: Magnetic field vector obtained from the onboard model of the magnetic field
+        @details: id = 0x00000048
+    **>
+    attribute SAT_MAG_FIELD_VECTOR_FROM_MODEL SAT_MAG_FIELD_VECTOR_FROM_MODEL_Data
+
+    <** @description: Magnetic field vector obtained from a magnetometer sensor, used for unified magnetic field sensor measurement
+        @details: id = 0x00000049
+    **>
+    attribute SAT_MAG_FIELD_VECTOR_FROM_SENSOR SAT_MAG_FIELD_VECTOR_FROM_SENSOR_Data
+
+
+    <** @description: EPS I communication execution status
+        @details: id = 0x0000004A
+    **>
+    attribute FDIR_EPS_I_CMD_EXEC_STATUS FDIR_EPS_I_CMD_EXEC_STATUS_Data
+
+    <** @description: EPS II PDM communication execution status
+        @details: id = 0x0000004B
+    **>
+    attribute FDIR_EPS_II_PDM_CMD_EXEC_STATUS FDIR_EPS_II_PDM_CMD_EXEC_STATUS_Data
+
+    <** @description: CubeADCS communication execution status
+        @details: id = 0x0000004C
+    **>
+    attribute FDIR_CUBEADCS_CMD_EXEC_STATUS FDIR_CUBEADCS_CMD_EXEC_STATUS_Data
+
+    <** @description: CubeADCS communication execution status
+        @details: id = 0x0000004D
+    **>
+    attribute FDIR_CUBEADCS_GEN2_CMD_EXEC_STATUS FDIR_CUBEADCS_GEN2_CMD_EXEC_STATUS_Data
+
+    <** @description: CubeADCS Gen2 communication execution status
+        @details: id = 0x0000004E
+    **>
+    attribute FDIR_CUBEADCS_GEN2_EVENTS FDIR_CUBEADCS_GEN2_EVENTS_Data
+
+    <** @description: S-Band communication execution status
+        @details: id = 0x0000004F
+    **>
+    attribute FDIR_S_BAND_TMTC_CMD_EXEC_STATUS FDIR_S_BAND_TMTC_CMD_EXEC_STATUS_Data
+
+    <** @description: UHF communication execution status
+        @details: id = 0x00000050
+    **>
+    attribute FDIR_UHF_CMD_EXEC_STATUS FDIR_UHF_CMD_EXEC_STATUS_Data
+
+    <** @description: GNSS communication execution status
+        @details: id = 0x00000051
+    **>
+    attribute FDIR_GNSS_CMD_EXEC_STATUS FDIR_GNSS_CMD_EXEC_STATUS_Data
+
+    <** @description: SDR communication execution status
+        @details: id = 0x00000052
+    **>
+    attribute FDIR_SDR_CMD_EXEC_STATUS FDIR_SDR_CMD_EXEC_STATUS_Data
+
+    <** @description: S/X-Band communication execution status
+        @details: id = 0x00000053
+    **>
+    attribute FDIR_S_X_BAND_CMD_EXEC_STATUS FDIR_S_X_BAND_CMD_EXEC_STATUS_Data
+
+    <** @description: THRUSTER communication execution status
+        @details: id = 0x00000054
+    **>
+    attribute FDIR_THRUSTER_CMD_EXEC_STATUS FDIR_THRUSTER_CMD_EXEC_STATUS_Data
+
+    <** @description: XBand FE module telemetry
+        @details: id = 0x00000055
+    **>
+    attribute XBandFeTelemetry XBand_Fe_Data
+    <** @description: Overall Information for the Batteries in the system
+        @details: id = 0x00000056
+    **>
+    attribute EpsOverallBatteryInfoType EpsOverallBatteryInfo_Data
+
+    <** @description: PPS Telemetry
+        @details: id = 0x00000057
+    **>
+    attribute PPS_Telemetry PPS_Telemetry_Data
+
+    <** @description: EPS III PDM communication execution status
+        @details: id = 0x00000058
+    **>
+    attribute FDIR_EPS_III_PDM_CMD_EXEC_STATUS FDIR_EPS_III_PDM_CMD_EXEC_STATUS_Data
+// begin EPS BP generated code
+
+
+//
+// Global declarations for EPS BP INSTANCE0
+//
+    <** @description: Battery Info
+        @details: id = 0x00000059
+    **>
+    attribute Eps2Inst0BatteryInfoType EPS2_BP_INST0_BP_INFO_Data
+    
+    <** @description: Battery pack device health info
+        @details: id = 0x0000005A
+    **>
+    attribute Eps2Inst0DeviceHealthInfoType EPS2_BP_INST0_DEVICE_HEALTH_INFO_Data
+    
+    <** @description: INA Sensor 1 data
+        @details: id = 0x0000005B
+    **>
+    attribute Eps2Inst0InaSensors1Type EPS2_BP_INST0_INA_SENSOR1_Data
+    
+    <** @description: INA Sensor 2 data
+        @details: id = 0x0000005C
+    **>
+    attribute Eps2Inst0InaSensors2Type EPS2_BP_INST0_INA_SENSOR2_Data
+    
+    <** @description: Balancer info
+        @details: id = 0x0000005D
+    **>
+    attribute Eps2Inst0BalancerInfoType EPS2_BP_INST0_BALANCER_INFO_Data
+    
+    <** @description: Balancer status
+        @details: id = 0x0000005E
+    **>
+    attribute Eps2Inst0BalancerStatusType EPS2_BP_INST0_BALANCER_STATUS_Data
+    
+    <** @description: Balancer Cells info
+        @details: id = 0x0000005F
+    **>
+    attribute Eps2Inst0BalancerCellsInfoType EPS2_BP_INST0_BALANCER_CELLS_INFO_Data
+    
+    
+
+    <** @description: Input Charger XP info
+        @details: id = 0x00000060
+    **>
+    attribute Eps2Inst0ChargerXpType  EPS2_BP_INST0_CHARGER_XP_Data
+    
+
+    <** @description: Input Charger XR info
+        @details: id = 0x00000061
+    **>
+    attribute Eps2Inst0ChargerXrType  EPS2_BP_INST0_CHARGER_XR_Data
+    
+
+    <** @description: Input Charger YP info
+        @details: id = 0x00000062
+    **>
+    attribute Eps2Inst0ChargerYpType  EPS2_BP_INST0_CHARGER_YP_Data
+    
+
+    <** @description: Input Charger YR info
+        @details: id = 0x00000063
+    **>
+    attribute Eps2Inst0ChargerYrType  EPS2_BP_INST0_CHARGER_YR_Data
+    
+
+    <** @description: Input Charger ZP info
+        @details: id = 0x00000064
+    **>
+    attribute Eps2Inst0ChargerZpType  EPS2_BP_INST0_CHARGER_ZP_Data
+    
+
+    <** @description: Input Charger ZR info
+        @details: id = 0x00000065
+    **>
+    attribute Eps2Inst0ChargerZrType  EPS2_BP_INST0_CHARGER_ZR_Data
+    
+    
+    <** @description: EPS II communication execution status
+        @details: id = 0x00000066
+    **>
+    attribute Eps2Inst0_FDIR_CMD_EXEC_STATUS_type FDIR_EPS_II_BP_INST0_CMD_EXEC_STATUS_Data    
+// end EPS BP generated code
+
+// begin EPS_III BP generated code
+
+
+//
+// Global declarations for EPS_III BP INSTANCE0
+//
+    <** @description: number of seconds since last power up  
+        @details: id = 0x00000067
+    **>
+    attribute Eps3Inst0_UpTimeInSecondsType EPS3_BP_INST0_uptime_in_seconds
+
+
+    <** @description: MCU mesurments voltage and temprature
+        @details: id = 0x00000068
+    **>
+    attribute Eps3Inst0CommonMeasurementType EPS3_BP_INST0common
+    
+    <** @description: Statuses related to HIB mode
+        @details: id = 0x00000069
+    **>
+    attribute Eps3Inst0HIBModeStatusType EPS3_BP_INST0hib_mode_status
+    
+    <** @description: Exact measured values on the device
+        @details: id = 0x0000006A
+    **>
+    attribute Eps3Inst0MeasurementsType EPS3_BP_INST0measurements
+    
+    <** @description: Statuses related to the discharging process
+        @details: id = 0x0000006B
+    **>
+    attribute Eps3Inst0DischargeStateType EPS3_BP_INST0discharging_state
+    
+    <** @description: Statuses related to the charging process
+        @details: id = 0x0000006C
+    **>
+    attribute Eps3Inst0ChargeOnStatusType EPS3_BP_INST0charge_status
+    
+    <** @description: Statuses related to the balancers
+        @details: id = 0x0000006D
+    **>
+    attribute Eps3Inst0BalancersStatusType EPS3_BP_INST0balancers_status
+    
+    <** @description: Statuses related to the battery cells
+        @details: id = 0x0000006E
+    **>
+    attribute Eps3Inst0BatteryCellsStatusType EPS3_BP_INST0battery_cells_status
+    
+    <** @description: Statuese related to the heaters of the batteries
+        @details: id = 0x0000006F
+    **>
+    attribute Eps3Inst0HeatersStatusType  EPS3_BP_INST0heaters_status
+    
+    <** @description: EPS III communication execution status
+        @details: id = 0x00000070
+    **>
+    attribute Eps3Inst0_FDIR_CMD_EXEC_STATUS_type EPS3_BP_INST0_CMD_EXEC_STATUS_Data    
+// end EPS_III BP generated code
+
+
+    <** @description: Dummy data for correct execution of datacache generator
+        @details: id = 0x00000071
+    **>
+    attribute VoltAmps dumb_data
+
+    <** @description: Dummy data for correct execution of datacache generator
+        @details: id = 0x00000072
+    **>
+    attribute VoltAllAmps dumb_data1    
+
+    <** @description: Dummy data for correct execution of datacache generator
+        @details: id = 0x00000073
+    **>
+    attribute MpptState_str dumb_data3
+
+    <** @description: Dummy data for correct execution of datacache generator
+        @details: id = 0x00000074
+    **>
+    attribute ReadEnDftStatus dumb_data4
+
+    <** @description: Dummy data for correct execution of datacache generator
+        @details: id = 0x00000075
+    **>
+    attribute OnOffStatus dumb_data5
+
+    <** @description: Dummy data for correct execution of datacache generator
+        @details: id = 0x00000076
+    **>
+    attribute ReadLvlState dumb_data6
+
+// begin EPS_III PDM_A generated code
+
+
+//
+// Global declarations for EPS_III PDM_A INSTANCE0
+//
+    <** @description: number of seconds since last power up 
+        @details: id = 0x00000077
+    **>
+    attribute Eps3_PDM_A_Inst0_UpTimeInSecondsType EPS3_PDM_A_INST0_uptime_in_seconds
+
+    <** @description: MCU measurements voltage and temperature  
+        @details: id = 0x00000078
+    **>
+    attribute Eps3_PDM_A_Inst0_CommonMesurementsType EPS3_PDM_A_INST0_common
+
+    <** @description: HIB mode status
+        @details: id = 0x00000079
+    **>
+    attribute Eps3_PDM_A_Inst0_HibModeType EPS3_PDM_A_INST0_hib_mode
+
+    <** @description: State of All Outputs
+        @details: id = 0x0000007A
+    **>
+    attribute Eps3_PDM_A_Inst0_OutputsStatusType EPS3_PDM_A_INST0_general_outputs
+
+    <** @description: Status of All Faults
+        @details: id = 0x0000007B
+    **>
+    attribute Eps3_PDM_A_Inst0_FaultsStatusType EPS3_PDM_A_INST0_general_faults
+
+    <** @description: EPS III Measurements of All Channels
+        @details: id = 0x0000007C
+    **>
+    attribute Eps3_PDM_A_Inst0_VoltAmpsMeasurementsType EPS3_PDM_A_INST0_all_measurements
+
+    <** @description: EPS III communication execution status
+        @details: id = 0x0000007D
+    **>
+    attribute Eps3_PDM_A_Inst0_FDIR_CMD_EXEC_STATUS_type EPS3_PDM_A_INST0_CMD_EXEC_STATUS_Data    
+// end EPS_III PDM_A generated code
+
+// begin EPS_III PDM_B generated code
+
+
+//
+// Global declarations for EPS_III PDM_B INSTANCE0
+//
+    <** @description: EPS III communication execution status
+        @details: id = 0x0000007E
+    **>
+    attribute Eps3_PDM_B_Inst0_FDIR_CMD_EXEC_STATUS_type EPS3_PDM_B_INST0_CMD_EXEC_STATUS_Data    
+
+    <** @description:  number of seconds since last power up 
+        @details: id = 0x0000007F
+    **>
+    attribute Eps3_PDM_B_Inst0_UpTimeInSecondsType EPS3_PDM_B_INST0_uptime_in_seconds
+
+    <** @description:  MCU measurements voltage and temperature
+        @details: id = 0x00000080
+    **>
+    attribute Eps3_PDM_B_Inst0_CommonMeasurementType EPS3_PDM_B_INST0_common
+
+    <** @description:  HIB mode status
+        @details: id = 0x00000081
+    **>
+    attribute Eps3_PDM_B_Inst0_hib_mode_Type EPS3_PDM_B_INST0_hib_mode
+
+    <** @description:  State of All Outputs
+        @details: id = 0x00000082
+    **>
+    attribute Eps3_PDM_B_Inst0_OutputsStatus_type EPS3_PDM_B_INST0_general_outputs
+
+    <** @description:  State of All Outputs
+        @details: id = 0x00000083
+    **>
+    attribute Eps3_PDM_B_Inst0_ChannelFlagState_type EPS3_PDM_B_INST0_channel_flag_state
+
+    <** @description:  Temperature sensor data
+        @details: id = 0x00000084
+    **>
+    attribute Eps3_PDM_B_Inst0_Temps_type EPS3_PDM_B_INST0_temperature
+
+    <** @description: Measurements of All Channels
+        @details: id = 0x00000085
+    **>
+    attribute Eps3_PDM_B_Inst0_VoltAmpsMeasurements_type EPS3_PDM_B_INST0_all_measurements    
+// end EPS_III PDM_B generated code
+
+// begin EPS_III EXPANDER generated code
+
+
+//
+// Global declarations for EPS_III EXPANDER INSTANCE0
+//
+    <** @description: EPS III communication execution status
+        @details: id = 0x00000086
+    **>
+    attribute Eps3_EXPANDER_Inst0_FDIR_CMD_EXEC_STATUS_type EPS3_EXPANDER_INST0_CMD_EXEC_STATUS_Data    
+
+    <** @description:  number of seconds since last power up 
+        @details: id = 0x00000087
+    **>
+    attribute Eps3_EXPANDER_Inst0_UpTimeInSecondsType EPS3_EXPANDER_INST0_uptime_in_seconds
+
+    <** @description:  MCU measurements voltage and temperature
+        @details: id = 0x00000088
+    **>
+    attribute Eps3_EXPANDER_Inst0_CommonMeasurementType EPS3_EXPANDER_INST0_common
+
+    <** @description:  State of All output Channels
+        @details: id = 0x00000089
+    **>
+    attribute Eps3_EXPANDER_Inst0_DigitalOutputsType EPS3_EXPANDER_INST0_outputs
+
+    <** @description:  Status of All general inputs Channels
+        @details: id = 0x0000008A
+    **>
+    attribute Eps3_EXPANDER_Inst0_GeneralInputType EPS3_EXPANDER_INST0_general_inputs
+
+    <** @description:  Status of All feedbacks
+        @details: id = 0x0000008B
+    **>
+    attribute Eps3_EXPANDER_Inst0_FeedbackType EPS3_EXPANDER_INST0_feedbacks
+
+    <** @description:  Voltage and Current measurements from all Current limiters
+        @details: id = 0x0000008C
+    **>
+    attribute Eps3_EXPANDER_Inst0_CurrentLimitersType EPS3_EXPANDER_INST0_volt_amp_measurements    
+// end EPS_III EXPANDER generated code
+
+// begin EPS_III INPUT_STAGE generated code
+
+
+//
+// Global declarations for EPS_III INPUT_STAGE INSTANCE0
+//
+
+    <** @description: number of seconds since last power up 
+        @details: id = 0x0000008D
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0_UpTimeInSecondsType EPS3_INPUT_STAGE_INST0_uptime_in_seconds
+    
+    <** @description: MCU mesurments voltage and temprature
+        @details: id = 0x0000008E
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0CommonMeasurementType EPS3_INPUT_STAGE_INST0common
+    
+    <** @description: HIB mode enabled 
+            0 - OFF
+            1 - ON
+            2 - UNKOWN
+        @details: id = 0x0000008F
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0hib_mode_status_type EPS3_INPUT_STAGE_INST0hib_mode_status
+
+    <** @description: State of Sefl lock output of the MCU 
+            0 - OFF
+            1 - ON
+            2 - UNKOWN
+        @details: id = 0x00000090
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0selflock_on_type EPS3_INPUT_STAGE_INST0selflock_on
+
+    <** @description: Statuses related to Solar Panel 1
+        @details: id = 0x00000091
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0Sp1InputDataType EPS3_INPUT_STAGE_INST0sp1
+
+    <** @description: Statuses related to Solar Panel 2
+        @details: id = 0x00000092
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0Sp2InputDataType EPS3_INPUT_STAGE_INST0sp2
+
+    <** @description: Statuses related to Solar Panel 3
+        @details: id = 0x00000093
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0Sp3InputDataType EPS3_INPUT_STAGE_INST0sp3
+
+    <** @description: External supply 7.5V 
+        @details: id = 0x00000094
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0SystemBusType EPS3_INPUT_STAGE_INST0system_bus
+    
+    <** @description: External supply 7.5V 
+        @details: id = 0x00000095
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0Bus7v5Type EPS3_INPUT_STAGE_INST0bus_7v5
+
+   <** @description: External supply 7.5V signal for Power Good 
+        0 - OFF
+        1 - ON
+        2 - UNKOWN 
+        @details: id = 0x00000096
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0bus_7v5_power_good_type EPS3_INPUT_STAGE_INST0bus_7v5_power_good
+    
+    <** @description: Undervoltage flag for buss 7.5V 
+            0 - OFF
+            1 - ON
+            2 - UNKOWN
+        @details: id = 0x00000097
+     **>    
+    attribute Eps3_INPUT_STAGE_Inst0undervoltage_7V5_type EPS3_INPUT_STAGE_INST0undervoltage_7V5
+
+    <** @description: External supply 3.3V
+        @details: id = 0x00000098
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0Bbus3v3Type EPS3_INPUT_STAGE_INST0bus_3v3
+
+    <** @description: Undervoltage flag for buss 3.3V 
+            0 - OFF
+            1 - ON
+            2 - UNKOWN
+        @details: id = 0x00000099
+     **>    
+    attribute Eps3_INPUT_STAGE_Inst0undervoltage_3V3_type EPS3_INPUT_STAGE_INST0undervoltage_3V3
+    
+    <** @description: EPS III communication execution status
+        @details: id = 0x0000009A
+    **>
+    attribute Eps3_INPUT_STAGE_Inst0_FDIR_CMD_EXEC_STATUS_type EPS3_INPUT_STAGE_INST0_CMD_EXEC_STATUS_Data    
+// end EPS_III INPUT_STAGE generated code
+
+
     <** @description: CubeMag ID: 197, 193, 190, 188
 	    @details: id = 0x0000009B
     **>
@@ -9,13 +863,209 @@
     **>
     attribute CubeWheel1_Telemetry WheelData1
     
-
+    
     <** @description: CubeWheel#24308 ID: 188, 196, 197
 	    @details: id = 0x0000009D
     **>
     attribute CubeWheel2_Telemetry WheelData2
 
 
+
+    <** @description: alpha(float), beta(float), sampling_mode(uint8) 
+        @details: id = 0x0000009E
+    **>
+    attribute FSS1_Data_type FSS1_Data
+
+        <** @description: alpha(float), beta(float), sampling_mode(uint8) 
+        @details: id = 0x0000009F
+    **>
+    attribute FSS2_Data_type FSS2_Data
+
+        <** @description: alpha(float), beta(float), sampling_mode(uint8) 
+        @details: id = 0x000000A0
+    **>
+    attribute FSS3_Data_type FSS3_Data
+
+        <** @description: alpha(float), beta(float), sampling_mode(uint8) 
+        @details: id = 0x000000A1
+    **>
+    attribute FSS4_Data_type FSS4_Data
+
+        <** @description: alpha(float), beta(float), sampling_mode(uint8) 
+        @details: id = 0x000000A2
+    **>
+    attribute FSS5_Data_type FSS5_Data
+
+    // added by Hyeeun
+    <** @description: Fine Sun Sensor Angles [alpha, beta] for FSS1 to 5
+        @details: id = 0x000000A3
+    **>
+    attribute ADCS_FSS ADCS_FSS_data
+
+    <** @description: Primary Magnetometer Field Vector [x, y, z]
+        @details: id = 0x000000A4G
+    **>
+    attribute ADCS_MAG ADCS_MAG_data
+
+    <** @description: IMU Angular Rate Vector [x, y, z]
+        @details: id = 0x000000A5H
+    **>
+    attribute ADCS_IMU ADCS_IMU_data
+
+    <** @description: Reaction Wheel Speeds [RW1, RW2]
+        @details: id = 0x000000A6I
+    **>
+    attribute ADCS_RW ADCS_RW_data
+    
+    <** @description: MTQ Command [x, y, z]
+        @details: id = 0x000000A7J
+    **>
+    attribute ADCS_MTQ ADCS_MTQ_data
+
+
+//
+// Global declarations for EPS BP INSTANCE0
+//
+  
+    <** @description: EPS II communication execution status
+        @details: id = 0x000000A8
+    **>
+    attribute SBpModeChangeInfo EPS2_BP_INST0_SBpModeChange_Data    
+
+     <** @description: EPS II communication execution status
+        @details: id = 0x000000A9
+    **>
+ 
+    attribute Eps2Inst0_BpModeSmRollingTrace_type EPS2_BP_BpModeSmRollingTrace_Data    
+
+
+     <** @description: EPS II communication execution status
+        @details: id = 0x000000AA
+    **>
+ 
+    attribute EPSII_PDM_SBSEDE_ConopsMode EPS2_PDM_SBSEDE_ConopsMode_Data
+
+   
+    
+     <** @description: EPS II communication execution status
+        @details: id = 0x000000AB
+    **>
+ 
+    attribute EPSII_PDM_1_SBSED_Bitmask_t EPS2_PDM_SBSED_Bitmask_Data    
+
+     
+     <** @description: EPS II communication execution status
+        @details: id = 0x000000AC
+    **>
+ 
+    attribute EPSII_PDM_1_SBasicSettings EPS2_PDM_SBasicSettings_Data     
+
+   
+
+     <** @description: EPS II communication execution status
+        @details: id = 0x000000AD
+    **>
+ 
+    attribute EPSII_PDM_1_SetBasicSettings EPS2_PDM_SetBasicSettings_Data 
+
+
+      <** @description: EPS II communication execution status
+        @details: id = 0x000000AE
+    **>
+ 
+    attribute EPSII_PDM_1_SBS_GetError EPS2_PDM_SBS_GetError_Data  
+
+      <** @description: EPS II communication execution status
+        @details: id = 0x000000AF
+    **>
+ 
+    attribute Eps2Inst0_SBasicSettings_type EPS2Inst0_PDM_SBasicSettings_Data  
+        
+// end EPS BP generated code
+
+    // Added by Jisoo
+    <** @description: IMU VN100 Data
+        @details: id = 0x000000B0
+    **>
+    attribute VN100_Data_type VN100_Data
+
+    <** @description: MPU6050 Sensor #1 Data
+        @details: id = 0x000000B1
+    **>
+    attribute MPU6050_1_Data_type MPU6050_1_Data
+
+    <** @description: MPU6050 Sensor #2 Data
+        @details: id = 0x000000B2
+    **>
+    attribute MPU6050_2_Data_type MPU6050_2_Data
+
+    <** @description: MTQ ALL Command Data
+        @details: id = 0x000000B3
+    **>
+    attribute MTQ_ALL_Command_Data_type MTQ_ALL_CMD_Data
+    // Added by Jisoo
+
+//Addad EPS
+    <** @description: EPS II communication execution status
+        @details: id = 0x000000B4
+    **>
+    attribute EPSII_BP_1_SDiagErrCounter2 EPS2Inst0_BP_SDiagErrCounter2_Data 
+    
+      <** @description: EPS II communication execution status
+        @details: id = 0x000000B5
+    **>
+    attribute Eps2Inst0__GetMainAppErrCounters2ype EPS2Inst0_BP_GetMainAppErrCounters2_Data  
+
+// end Addad EPS
+
+    // Added by Jisoo
+    <** @description: INA Data
+        @details: id = 0x000000B6
+    **>
+    attribute INA_Data_type INA_Data 
+
+    <** @description: ANG Data
+        @details: id = 0x000000B7
+    **> 
+    attribute ANG_Data_type ANG_Data
+    // Added by Jisoo
+
+//Addad hyoju
+    <** @description: camera mode
+        @details: id = 0x000000B8
+    **>
+    attribute CAMERA_MODE_Data_type CAMERA_MODE_Data
+
+
+
+
+// Added by Hyeeun for DC about ADCS SW INPUT/OUTPUT
+    <** @description: ADCS Mode 
+        @details: id = 0x000000B9 
+    **>
+    attribute ADCS_mode_type ADCS_mode
+
+    <** @description: Flag about ADCS algorithms  
+        @details: id = 0x000000BA
+    **>
+    attribute ADCS_flag_alg_type ADCS_flag_alg
+
+    <** @description: Result of ADCS algorithms  
+        @details: id = 0x000000BB
+    **>
+    attribute ADCS_result_type ADCS_result
+
+    <** @description: Data related to ADCS HW
+        @details: id = 0x000000BC
+    **>
+    attribute ADCS_HW_type ADCS_HW
+
+
+
+
+
+
+// Added by Seungwon for DC about CubeSpace Telecommand
     <** @description: CubeSpace_Telecommand_Flag
 	    @details: id = 0x000000BD
     **>
@@ -38,3 +1088,5 @@
 	    @details: id = 0x000000C0
     **>
     attribute CubeMag_Telecommand Magcommand
+
+}

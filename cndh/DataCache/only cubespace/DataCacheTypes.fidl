@@ -1,0 +1,282 @@
+    <** @description: Magnetometer **>
+    struct CubeMag_Telemetry
+    {
+// id: 197
+        <** @description: X axis of Primary Magnetometer Measurement**>
+        Float X_axis
+        
+        <** @description: Y axis of Primary Magnetometer Measurement**>
+        Float Y_axis
+        
+        <** @description: Z axis of Primary Magnetometer Measurement**>
+        Float Z_axis
+        
+        <** @description: Vaildation of Primary Magnetometer Measurement**>
+        Boolean DataValid
+
+
+// id: 193
+        <** @description: X axis of Redundant Magnetometer Measurement**>
+        Float X_axis_red
+
+        <** @description: Y axis of Redundant Magnetometer Measurement**>
+        Float Y_axis_red
+        
+        <** @description: Z axis of Redundant Magnetometer Measurement**>
+        Float Z_axis_red
+        
+        <** @description: Vaildation of Redundant Magnetometer Measurement**>
+        Boolean DataValid
+
+
+// id: 190
+        <** @description: Burn Wire Current [mA] **>
+        UInt32 BurnCurrent
+
+        <** @description: Deployment Detection Pin State **>
+        Boolean DeploymentPinState
+
+        <** @description: Deployment Burn Wire Enable Pin State **>
+        Boolean BurnPinState
+
+        <** @description: Burn Wire Under Current Flag **>
+        Boolean BurnUnderCurrent
+
+        <** @description: Burn Wire Over Current Flag **>
+        Boolean BurnOverCurrent
+
+        <** @description: CubeMag did not detect deployment before configured timeout**>
+        Boolean DeploymentTimeout
+
+
+// id: 188
+        <** @description: CubeMag Service State
+            0: ARM, 1: DEPLOY, 2: IDLE, 3: ERROR
+        **>
+        UInt8 MagSvcState
+
+        <** @description: Primary Magnetometer State
+            0: OFF, 1: INIT, 2: IDLE, 3: AUTO, 4: SAMPLE, 5: ERROR
+        **>
+        UInt8 PrimaryMagState
+
+        <** @description: Redundant Magnetometer State
+            0: OFF, 1: INIT, 2: IDLE, 3: AUTO, 4: SAMPLE, 5: ERROR
+        **>
+        UInt8 RedundantMagState
+    }
+
+
+
+    <** @description: Reaction Wheel 1 **>
+    struct CubeWheel1_Telemetry
+    {
+// id: 188
+        <** @description: Wheel speed measurement [RPM] **>
+        Float WheelSpeed_1
+        
+        <** @description: Wheel error state
+            0: Data Valid, 1: Encoder No Response, 2: Hall Sensor Encoder Mismatch, 3: Speed Not Reached Timeout
+        **>
+        UInt8 WheelErrorState_1
+
+
+// id: 196
+        <** @description: Wheel reference speed [RPM] **>
+        Float ReferenceSpeed_1
+
+
+// id: 197
+        <** @description: Switch motor power on/off **>
+        Boolean MotorPowerSwitch_1
+    }
+
+
+
+
+    <** @description: Reaction Wheel 2 **>
+    struct CubeWheel2_Telemetry
+    {
+// id: 188
+        <** @description: Wheel speed measurement [RPM] **>
+        Float WheelSpeed_2
+        
+        <** @description: Wheel error state
+            0: Data Valid, 1: Encoder No Response, 2: Hall Sensor Encoder Mismatch, 3: Speed Not Reached Timeout
+        **>
+        UInt8 WheelErrorState_2
+
+
+// id: 196
+        <** @description: Wheel reference speed [RPM] **>
+        Float ReferenceSpeed_2
+
+
+// id: 197
+        <** @description: Switch motor power on/off **>
+        Boolean MotorPowerSwitch_2
+    }
+
+
+
+    <** @description: CubeSpace Telecommand Flag **>
+    struct CubeSpace_Telecommand_Flag
+    {
+        UInt8 CM_TC_1
+        UInt8 CM_TC_3
+        UInt8 CM_TC_4
+        UInt8 CM_TC_5
+        UInt8 CM_TC_6
+        UInt8 CM_TC_60
+        UInt8 CM_TC_63
+        UInt8 CM_TC_66
+
+        UInt8 CW1_TC_1
+        UInt8 CW1_TC_3
+        UInt8 CW1_TC_4
+        UInt8 CW1_TC_5
+        UInt8 CW1_TC_6
+        UInt8 CW1_TC_60
+        UInt8 CW1_TC_62
+        UInt8 CW1_TC_64
+
+        UInt8 CW2_TC_1
+        UInt8 CW2_TC_3
+        UInt8 CW2_TC_4
+        UInt8 CW2_TC_5
+        UInt8 CW2_TC_6
+        UInt8 CW2_TC_60
+        UInt8 CW2_TC_62
+        UInt8 CW2_TC_64
+    }
+
+
+
+    <** @description: Reaction Wheel 1 **>
+    struct CubeWheel1_Telecommand
+    {
+// id: 1
+        <** @description: the type of reset to perform
+        0: Do Nothing, 55: Soft, 66: Hard
+        **>
+        UInt8 reset_type_1
+
+// id: 3
+        <** @description: the type of reset to perform
+        0: Reference Head, 1: Reference Tail
+        **>
+        UInt8 ErrorLog_IndexReference_1
+        UInt8 ErrorLog_IndexValue_1
+        UInt8 ErrorLog_Entries_1
+
+// id: 4
+        UInt32 ErrorLog_EntryTimestamp_1
+        UInt32 ErrorLog_EntryErrorCode_1
+
+// id: 5 -> No value
+
+// id: 6
+        <** @description: Active State, Buffer Full Action
+        Active State(bit:1) -> 0: Enabled(Logging is disabled), 1: Disabled(Logging is enabled)
+        Buffer Full Action(bit:1) -> 0: Ignore(Ignore new entries when buffer is full),
+                                     1: Erase(Erase log and new entry when buffer is full)
+        **>
+        UInt8 ErrorLogSettings_1
+
+// id: 60
+        Boolean MotorPowerSwitch_1
+
+// id: 62 -> No value        
+
+// id: 64
+        Float ReferenceSpeed_1
+    }
+
+
+    <** @description: Reaction Wheel 2 **>
+    struct CubeWheel2_Telecommand
+    {
+// id: 1
+        <** @description: the type of reset to perform
+        0: Do Nothing, 55: Soft, 66: Hard
+        **>
+        UInt8 reset_type_2
+
+// id: 3
+        <** @description: the type of reset to perform
+        0: Reference Head, 1: Reference Tail
+        **>
+        UInt8 ErrorLog_IndexReference_2
+        UInt8 ErrorLog_IndexValue_2
+        UInt8 ErrorLog_Entries_2
+
+// id: 4
+        UInt32 ErrorLog_EntryTimestamp_2
+        UInt32 ErrorLog_EntryErrorCode_2
+
+// id: 5 -> No value
+
+// id: 6
+        <** @description: Active State, Buffer Full Action
+        Active State(bit:1) -> 0: Enabled(Logging is disabled), 1: Disabled(Logging is enabled)
+        Buffer Full Action(bit:1) -> 0: Ignore(Ignore new entries when buffer is full),
+                                     1: Erase(Erase log and new entry when buffer is full)
+        **>
+        UInt8 ErrorLogSettings_2
+
+// id: 60
+        Boolean MotorPowerSwitch_2
+
+// id: 62 -> No value        
+
+// id: 64
+        Float ReferenceSpeed_2
+    }
+
+
+
+    <** @description: Magnetometer **>
+    struct CubeMag_Telecommand
+    {
+// id: 1
+        <** @description: the type of reset to perform
+        0: Do Nothing, 55: Soft, 66: Hard
+        **>
+        UInt8 reset_type_2
+
+// id: 3
+        <** @description: the type of reset to perform
+        0: Reference Head, 1: Reference Tail
+        **>
+        UInt8 ErrorLog_IndexReference_2
+        UInt8 ErrorLog_IndexValue_2
+        UInt8 ErrorLog_Entries_2
+
+// id: 4
+        UInt32 ErrorLog_EntryTimestamp_2
+        UInt32 ErrorLog_EntryErrorCode_2
+
+// id: 5 -> No value
+
+// id: 6
+        <** @description: Active State, Buffer Full Action
+        Active State(bit:1) -> 0: Enabled(Logging is disabled), 1: Disabled(Logging is enabled)
+        Buffer Full Action(bit:1) -> 0: Ignore(Ignore new entries when buffer is full),
+                                     1: Erase(Erase log and new entry when buffer is full)
+        **>
+        UInt8 ErrorLogSettings_2
+
+// id: 60
+        <** @description: PreferredPrimaryMagnetometer(4bit), CurrentPrimaryMagnetometer(4bit)
+        0: PNI, 1: MMC **>       
+        UInt8 CubeMagConfigItems
+        UInt16 DeployTimeout
+
+        <** @description: Primary Auto-Select(1bit)**>
+        UInt8 Primary_AutoSelect
+
+// id: 63 -> No value        
+
+// id: 66
+        Float ReferenceSpeed_2
+    }

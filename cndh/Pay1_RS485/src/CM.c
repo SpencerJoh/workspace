@@ -332,6 +332,8 @@ void send_telecommand(DATA_CACHE_CubeSpace_Telecommand_Flag_t* flags) {
         flags->u8CW1_TC_60 = 0;
     } else if (flags->u8CW1_TC_64)
     {
+
+        
         /* this code would be replaced by getting value from datacache */
         float rpm = 100.0f; // Example RPM value
         uint8_t tx_buff_CW_TC64[11] = {ESC, SOM, 64, MainOBC, ReactionWheel1, 0xF0, 0x02};

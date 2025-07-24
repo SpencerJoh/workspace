@@ -263,6 +263,9 @@ typedef struct
     DATA_CACHE_ADCS_result_type_t adcs_result;
     DATA_CACHE_ADCS_HW_type_t adcs_hw;
     DATA_CACHE_CubeSpace_Telecommand_Flag_t tc_flag;
+    DATA_CACHE_CubeWheel1_Telecommand_t wheelcommand1;
+    DATA_CACHE_CubeWheel2_Telecommand_t wheelcommand2;
+    DATA_CACHE_CubeMag_Telecommand_t magcommand;
 } PACKED_STRUCT datacache_t;
 
 /**********************************************************************
@@ -1602,6 +1605,27 @@ static const dc_cfg_entry_immut_t dc_data_cfg[DC_DID_MAX] =
         .data_id = DC_ATTR_ID_TC_FLAG,
         .p_data_raw = &dc_instance.tc_flag,
         .data_size = sizeof(dc_instance.tc_flag),
+        .data_timeout = 5000U
+    },
+    // wheelcommand1
+    {
+        .data_id = DC_ATTR_ID_WHEELCOMMAND1,
+        .p_data_raw = &dc_instance.wheelcommand1,
+        .data_size = sizeof(dc_instance.wheelcommand1),
+        .data_timeout = 5000U
+    },
+    // wheelcommand2
+    {
+        .data_id = DC_ATTR_ID_WHEELCOMMAND2,
+        .p_data_raw = &dc_instance.wheelcommand2,
+        .data_size = sizeof(dc_instance.wheelcommand2),
+        .data_timeout = 5000U
+    },
+    // magcommand
+    {
+        .data_id = DC_ATTR_ID_MAGCOMMAND,
+        .p_data_raw = &dc_instance.magcommand,
+        .data_size = sizeof(dc_instance.magcommand),
         .data_timeout = 5000U
     }
 };
@@ -4422,5 +4446,47 @@ dc_data_status_t dc_get_tc_flag(DATA_CACHE_CubeSpace_Telecommand_Flag_t * const 
 void dc_set_tc_flag(DATA_CACHE_CubeSpace_Telecommand_Flag_t * const p_new_data)
 {
     dc_set_raw_data(DC_DATA_INPUT_INTERNAL, DC_DID_TC_FLAG, p_new_data, sizeof(DATA_CACHE_CubeSpace_Telecommand_Flag_t));
+}
+
+dc_data_status_t dc_get_wheelcommand1(DATA_CACHE_CubeWheel1_Telecommand_t * const p_data)
+{
+    return dc_get_raw_data(DC_DID_WHEELCOMMAND1,
+                           p_data,
+                           sizeof(DATA_CACHE_CubeWheel1_Telecommand_t),
+                           0U,
+                           sizeof(DATA_CACHE_CubeWheel1_Telecommand_t));
+}
+
+void dc_set_wheelcommand1(DATA_CACHE_CubeWheel1_Telecommand_t * const p_new_data)
+{
+    dc_set_raw_data(DC_DATA_INPUT_INTERNAL, DC_DID_WHEELCOMMAND1, p_new_data, sizeof(DATA_CACHE_CubeWheel1_Telecommand_t));
+}
+
+dc_data_status_t dc_get_wheelcommand2(DATA_CACHE_CubeWheel2_Telecommand_t * const p_data)
+{
+    return dc_get_raw_data(DC_DID_WHEELCOMMAND2,
+                           p_data,
+                           sizeof(DATA_CACHE_CubeWheel2_Telecommand_t),
+                           0U,
+                           sizeof(DATA_CACHE_CubeWheel2_Telecommand_t));
+}
+
+void dc_set_wheelcommand2(DATA_CACHE_CubeWheel2_Telecommand_t * const p_new_data)
+{
+    dc_set_raw_data(DC_DATA_INPUT_INTERNAL, DC_DID_WHEELCOMMAND2, p_new_data, sizeof(DATA_CACHE_CubeWheel2_Telecommand_t));
+}
+
+dc_data_status_t dc_get_magcommand(DATA_CACHE_CubeMag_Telecommand_t * const p_data)
+{
+    return dc_get_raw_data(DC_DID_MAGCOMMAND,
+                           p_data,
+                           sizeof(DATA_CACHE_CubeMag_Telecommand_t),
+                           0U,
+                           sizeof(DATA_CACHE_CubeMag_Telecommand_t));
+}
+
+void dc_set_magcommand(DATA_CACHE_CubeMag_Telecommand_t * const p_new_data)
+{
+    dc_set_raw_data(DC_DATA_INPUT_INTERNAL, DC_DID_MAGCOMMAND, p_new_data, sizeof(DATA_CACHE_CubeMag_Telecommand_t));
 }
 
